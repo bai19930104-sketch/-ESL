@@ -555,7 +555,7 @@
   { "word": "orchestra", "pos": "n.", "group": "ESL 6A", "chinese": "管弦樂團", "defEn": "a large group of musicians who play different instruments together", "example": "The school orchestra played several beautiful songs while parents and students listened quietly." },
   { "word": "text message", "pos": "n.", "group": "ESL 6A", "chinese": "簡訊 / 訊息", "defEn": "a short written message sent from one phone or device to another", "example": "I sent my mother a text message to tell her that I would arrive home a little later than usual." },
   { "word": "textbook", "pos": "n.", "group": "ESL 6A", "chinese": "課本", "defEn": "a book used for studying a school subject", "example": "Our science textbook has many pictures and activities that help us understand each lesson more easily." }
-]
+];
 
     // State
     let wordDatabase = [];
@@ -583,10 +583,11 @@
 
     // 3. Load / Save Database
    function loadDatabase() {
-    // 每次開啟都直接載入全新的 defaultData，並更新儲存庫
     wordDatabase = defaultData;
     localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
-    document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
+    if (document.getElementById('jsonInput')) {
+        document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
+    }
 }
 
     function saveConfiguration() {
