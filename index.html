@@ -1,868 +1,351 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🌸 小學館全美語 ESL</title>
-  <style>
-    :root {
-      --bg-color: #F7F9FC;
-      --card-bg: #FFFFFF;
-      --primary-blue: #E3F2FD;
-      --primary-blue-dark: #90CAF9;
-      --accent-green: #E8F5E9;
-      --accent-green-dark: #A5D6A7;
-      --accent-yellow: #FFFDE7;
-      --accent-yellow-dark: #FFF59D;
-      --accent-pink: #FFEBEE;
-      --accent-pink-dark: #EF9A9A;
-      --text-main: #37474F;
-      --text-muted: #78909C;
-      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
-      --radius-lg: 20px;
-      --radius-md: 12px;
-      --radius-sm: 8px;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 小學館全美語 ESL</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333333;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans TC';
-    }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
 
-    body {
-      background-color: var(--bg-color);
-      color: var(--text-main);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      min-height: 100vh;
-      padding: 20px;
-    }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    .app-container {
-      width: 100%;
-      max-width: 650px;
-      background: var(--card-bg);
-      border-radius: var(--radius-lg);
-      box-shadow: var(--shadow);
-      padding: 24px;
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
 
-    /* Header & Selectors */
-    header {
-      text-align: center;
-    }
+        .controls {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-    h1 {
-      font-size: 1.8rem;
-      color: #263238;
-      margin-bottom: 16px;
-    }
+        select, button, textarea {
+            font-size: 16px;
+            padding: 8px 12px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
 
-    .controls-bar {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-    }
+        button {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
 
-    .control-group {
-      flex: 1;
-      min-width: 140px;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-      text-align: left;
-    }
+        button:hover {
+            background-color: #357abd;
+        }
 
-    .control-group label {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: bold;
-    }
+        .nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
 
-    select, button, input, textarea {
-      font-size: 1rem;
-      padding: 10px 14px;
-      border-radius: var(--radius-md);
-      border: 2px solid #E0E0E0;
-      outline: none;
-      transition: all 0.2s ease;
-    }
+        .nav-btn {
+            background-color: #e0e0e0;
+            color: #333;
+        }
 
-    select:focus, input:focus, textarea:focus {
-      border-color: var(--primary-blue-dark);
-    }
+        .nav-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
 
-    button {
-      cursor: pointer;
-      background-color: var(--primary-blue);
-      border: none;
-      font-weight: bold;
-      color: var(--text-main);
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-    }
+        .tab-content {
+            display: none;
+            width: 100%;
+            max-width: 800px;
+        }
 
-    button:hover {
-      filter: brightness(0.95);
-      transform: translateY(-1px);
-    }
+        .tab-content.active {
+            display: block;
+        }
 
-    button:active {
-      transform: translateY(0);
-    }
+        /* 學習卡片樣式 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+            gap: 20px;
+        }
 
-    /* Tabs Nav */
-    .tabs-nav {
-      display: flex;
-      background: #F0F4F8;
-      padding: 6px;
-      border-radius: var(--radius-md);
-      gap: 6px;
-    }
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
 
-    .tab-btn {
-      flex: 1;
-      padding: 10px 4px;
-      background: transparent;
-      border: none;
-      border-radius: var(--radius-sm);
-      font-size: 0.95rem;
-      color: var(--text-muted);
-    }
+        .card:hover {
+            transform: translateY(-5px);
+        }
 
-    .tab-btn.active {
-      background: var(--card-bg);
-      color: var(--text-main);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
+        .word-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #2c3e50;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
 
-    /* Tab Contents */
-    .tab-content {
-      display: none;
-      flex-direction: column;
-      gap: 16px;
-    }
+        .pos {
+            font-size: 14px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
 
-    .tab-content.active {
-      display: flex;
-    }
+        .chinese {
+            font-size: 18px;
+            color: #e67e22;
+            margin: 8px 0;
+        }
 
-    /* Component: Card Design */
-    .card {
-      background: var(--accent-yellow);
-      border-radius: var(--radius-lg);
-      padding: 24px;
-      text-align: center;
-      position: relative;
-      box-shadow: inset 0 0 0 2px rgba(255, 235, 59, 0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-    }
+        .def-en {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+        }
 
-    .pos-badge {
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 0.85rem;
-      font-weight: bold;
-      display: inline-block;
-    }
-    .pos-n { background-color: #BBDEFB; color: #0D47A1; }
-    .pos-adj { background-color: #C8E6C9; color: #1B5E20; }
-    .pos-v { background-color: #FFCDD2; color: #B71C1C; }
-    .pos-adv { background-color: #E1BEE7; color: #4A148C; }
-    .pos-default { background-color: #CFD8DC; color: #263238; }
+        .example {
+            font-size: 13px;
+            color: #777;
+            background: #f9f9f9;
+            padding: 6px;
+            border-left: 3px solid var(--primary-color);
+            border-radius: 0 4px 4px 0;
+        }
 
-    .word-title {
-      font-size: 2.8rem;
-      font-weight: bold;
-      letter-spacing: 1px;
-    }
+        .audio-btn {
+            background: none;
+            color: var(--primary-color);
+            border: none;
+            font-size: 18px;
+            padding: 0 5px;
+        }
 
-    .btn-speaker {
-      background: #FFFFFF;
-      border-radius: 50%;
-      width: 50px;
-      height: 50px;
-      font-size: 1.5rem;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      padding: 0;
-    }
+        .audio-btn:hover {
+            background: none;
+            color: var(--secondary-color);
+        }
 
-    .info-row {
-      width: 100%;
-      background: rgba(255, 255, 255, 0.7);
-      padding: 12px 16px;
-      border-radius: var(--radius-md);
-      text-align: left;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
+        /* 測驗樣式 */
+        .quiz-card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
 
-    .info-text {
-      font-size: 1.05rem;
-    }
+        .quiz-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 20px;
+        }
 
-    .btn-audio-sm {
-      background: var(--primary-blue);
-      border-radius: 50%;
-      width: 32px;
-      height: 32px;
-      min-width: 32px;
-      font-size: 0.9rem;
-      padding: 0;
-    }
+        .quiz-opt-btn {
+            padding: 15px;
+            font-size: 16px;
+            background-color: #f8f9fa;
+            color: #333;
+            border: 2px solid #e9ecef;
+        }
 
-    .nav-controls {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-top: 8px;
-    }
+        .quiz-opt-btn:hover {
+            background-color: #e2e6ea;
+        }
 
-    /* Dictation Tab */
-    .dictation-card {
-      background: var(--accent-green);
-    }
+        .setting-box {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
 
-    .dictation-input {
-      font-size: 1.3rem;
-      text-align: center;
-      width: 100%;
-      padding: 12px;
-    }
-
-    .feedback-msg {
-      font-size: 1.1rem;
-      font-weight: bold;
-      min-height: 28px;
-    }
-    .feedback-success { color: #2E7D32; }
-    .feedback-error { color: #C62828; }
-
-    /* Puzzle Tab */
-    .puzzle-card {
-      background: var(--accent-pink);
-    }
-
-    .slots-area, .tiles-area {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      justify-content: center;
-      min-height: 50px;
-      width: 100%;
-      padding: 8px;
-    }
-
-    .slots-area {
-      border-bottom: 2px dashed var(--accent-pink-dark);
-      padding-bottom: 16px;
-    }
-
-    .letter-btn {
-      width: 44px;
-      height: 44px;
-      font-size: 1.2rem;
-      background: #FFFFFF;
-      border: 2px solid #FFCDD2;
-      border-radius: var(--radius-sm);
-      box-shadow: 0 4px 0 #EF9A9A;
-    }
-
-    .letter-btn:active {
-      transform: translateY(4px);
-      box-shadow: none;
-    }
-
-    .letter-btn.empty {
-      background: rgba(255,255,255,0.4);
-      border: 2px dashed #BDBDBD;
-      box-shadow: none;
-    }
-
-    /* Config Tab */
-    textarea {
-      width: 100%;
-      height: 200px;
-      font-family: monospace;
-      font-size: 0.9rem;
-      resize: vertical;
-    }
-
-    .btn-action {
-      background-color: var(--accent-green-dark);
-      color: #1B5E20;
-      padding: 12px;
-      font-size: 1rem;
-    }
-
-    /* Responsiveness */
-    @media (max-width: 480px) {
-      .app-container { padding: 16px; }
-      .word-title { font-size: 2.2rem; }
-      .tab-btn { font-size: 0.85rem; padding: 8px 2px; }
-    }
-  </style>
+        textarea {
+            width: 100%;
+            height: 300px;
+            box-sizing: border-box;
+            font-family: monospace;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="app-container">
     <header>
-      <h1>🌸 小學館全美語 ESL</h1>
-      <div class="controls-bar">
-        <div class="control-group">
-          <label for="groupSelect">選擇包裹：</label>
-          <select id="groupSelect" onchange="onGroupChange()"></select>
-        </div>
-        <div class="control-group">
-          <label for="voiceSelect">語音發音：</label>
-          <select id="voiceSelect"></select>
-        </div>
-      </div>
+        <h1>🌸 小學館全美語 ESL</h1>
     </header>
 
-    <!-- Navigation Tabs -->
-    <nav class="tabs-nav">
-      <button class="tab-btn active" onclick="switchTab('learn')">📖 學習</button>
-      <button class="tab-btn" onclick="switchTab('dictation')">🎧 聽寫</button>
-      <button class="tab-btn" onclick="switchTab('puzzle')">🧩 拼圖</button>
- <!-- <button class="nav-btn" onclick="switchTab('settings')">⚙️ 設定</button> -->
-    </nav>
-
-    <!-- Tab A: Learn -->
-    <section id="tab-learn" class="tab-content active">
-      <div class="card">
-        <span id="learn-pos" class="pos-badge pos-n">n.</span>
-        <div id="learn-word" class="word-title">word</div>
-        <button class="btn-speaker" onclick="speakCurrentWord()">🔊</button>
-        
-        <div class="info-row">
-          <span class="info-text"><b>中文：</b><span id="learn-chinese"></span></span>
+    <div class="controls">
+        <div>
+            <label for="groupSelect">選擇包裹：</label>
+            <select id="groupSelect" onchange="filterData()"></select>
         </div>
-        <div class="info-row">
-          <span class="info-text"><b>解釋：</b><span id="learn-defEn"></span></span>
-          <button class="btn-audio-sm" onclick="speakText(currentWordObj.defEn)">🔊</button>
+        <div>
+            <label for="voiceSelect">語音發音：</label>
+            <select id="voiceSelect"></select>
         </div>
-        <div class="info-row">
-          <span class="info-text"><b>例句：</b><span id="learn-example"></span></span>
-          <button class="btn-audio-sm" onclick="speakText(currentWordObj.example)">🔊</button>
+    </div>
+
+    <div class="nav-tabs">
+        <button class="nav-btn active" onclick="switchTab('learn')">📖 學習</button>
+        <button class="nav-btn" onclick="switchTab('quiz')">🧩 測驗</button>
+        <!-- ⚙️ 設定頁面已隱藏，僅管理員可在程式碼中開啟 -->
+        <!-- <button class="nav-btn" onclick="switchTab('settings')">⚙️ 設定</button> -->
+    </div>
+
+    <!-- 學習分頁 -->
+    <div id="learnTab" class="tab-content active">
+        <div id="cardGrid" class="grid-container"></div>
+    </div>
+
+    <!-- 測驗分頁 -->
+    <div id="quizTab" class="tab-content">
+        <div class="quiz-card">
+            <h2 id="quizQuestion">---</h2>
+            <div id="quizOptions" class="quiz-options"></div>
+            <p id="quizFeedback" style="margin-top: 15px; font-weight: bold;"></p>
+            <button onclick="nextQuiz()" style="margin-top: 15px;">下一題</button>
         </div>
-      </div>
+    </div>
 
-      <div class="nav-controls">
-        <button onclick="prevWord()">⬅️ 上一個</button>
-        <span id="learn-progress">1 / 1</span>
-        <button onclick="nextWord()">下一個 ➡️</button>
-      </div>
-    </section>
-
-    <!-- Tab B: Dictation -->
-    <section id="tab-dictation" class="tab-content">
-      <div class="card dictation-card">
-        <button class="btn-speaker" onclick="speakCurrentWord()">🔊 再聽一次</button>
-        <div class="info-row">
-          <span class="info-text"><b>提示：</b>[<span id="dict-pos"></span>] <span id="dict-chinese"></span></span>
+    <!-- 設定分頁 (預設隱藏) -->
+    <div id="settingsTab" class="tab-content">
+        <div class="setting-box">
+            <h3>JSON 單字庫數據編輯：</h3>
+            <textarea id="jsonInput"></textarea>
+            <br><br>
+            <button onclick="saveDatabase()">💾 儲存並更新數據</button>
         </div>
-        <div class="info-row">
-          <span class="info-text"><b>解釋：</b><span id="dict-defEn"></span></span>
-        </div>
+    </div>
 
-        <input type="text" id="dict-input" class="dictation-input" placeholder="請在此輸入英文單字..." autocomplete="off">
-        <div id="dict-feedback" class="feedback-msg"></div>
+    <script>
+        // 內建完整 ESL 1A ~ 6A 單字資料
+        const defaultData = [
+          { "word": "new", "pos": "adj.", "group": "ESL 1A", "chinese": "新的", "defEn": "not old; made or bought a short time ago", "example": "I have a new bag." },
+          { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的 / 老的", "defEn": "not new; having been here for a long time", "example": "This is my old bike." },
+          { "word": "play basketball", "pos": "v. phr.", "group": "ESL 1A", "chinese": "打籃球", "defEn": "to play a game with a ball and a basket", "example": "I play basketball with my friends." },
+          { "word": "play football", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢美式足球", "defEn": "to play a game with a ball and two teams", "example": "We play football at school." },
+          { "word": "play soccer", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢足球", "defEn": "to play a game where you kick a ball", "example": "They play soccer in the park." },
+          { "word": "teacher", "pos": "n.", "group": "ESL 1A", "chinese": "老師", "defEn": "a看了一下你目前開啟的 [index.html](https://github.com/bai19930104-sketch/-ESL/blob/main/index.html) 編輯畫面，因為檔案內被清空了，所以網頁才會顯示一片空白。
 
-        <div id="dict-example-box" class="info-row" style="display: none;">
-          <span class="info-text"><b>例句：</b><span id="dict-example"></span></span>
-          <button class="btn-audio-sm" onclick="speakText(currentWordObj.example)">🔊</button>
-        </div>
-      </div>
+這裡為你整理好**完整的 HTML 原始碼**（內含 **ESL 1A ~ 6A 的完整單字庫**、**隱藏設定按鈕**以及**強制讀取最新單字**的邏輯）。請直接複製下方整段程式碼，貼回 GitHub 的編輯框中：
 
-      <div style="display: flex; gap: 10px;">
-        <button id="dict-check-btn" style="flex: 1;" onclick="checkDictation()">檢查答案</button>
-        <button id="dict-hint-btn" style="background: var(--accent-yellow-dark);" onclick="showDictationHint()">💡 第一個字母</button>
-      </div>
-
-      <div class="nav-controls">
-        <button onclick="prevWord()">⬅️ 上一個</button>
-        <span id="dict-progress">1 / 1</span>
-        <button onclick="nextWord()">下一個 ➡️</button>
-      </div>
-    </section>
-
-    <!-- Tab C: Puzzle -->
-    <section id="tab-puzzle" class="tab-content">
-      <div class="card puzzle-card">
-        <div class="info-row">
-          <span class="info-text"><b>中文：</b><span id="puz-chinese"></span></span>
-        </div>
-        <div class="info-row">
-          <span class="info-text"><b>解釋：</b><span id="puz-defEn"></span></span>
-        </div>
-
-        <!-- Selected Letters Area -->
-        <div id="puz-slots" class="slots-area"></div>
-
-        <!-- Available Letter Tiles -->
-        <div id="puz-tiles" class="tiles-area"></div>
-
-        <div id="puz-feedback" class="feedback-msg"></div>
-      </div>
-
-      <div style="display: flex; gap: 10px;">
-        <button style="flex: 1; background: var(--accent-yellow-dark);" onclick="resetPuzzle()">🔄 清除重來</button>
-        <button style="flex: 1;" onclick="checkPuzzle()">檢查答案</button>
-      </div>
-
-      <div class="nav-controls">
-        <button onclick="prevWord()">⬅️ 上一個</button>
-        <span id="puz-progress">1 / 1</span>
-        <button onclick="nextWord()">下一個 ➡️</button>
-      </div>
-    </section>
-
-    <!-- Tab D: Configuration -->
-    <section id="tab-config" class="tab-content">
-      <div class="control-group">
-        <label for="jsonInput">JSON 單字庫數據編輯：</label>
-        <textarea id="jsonInput"></textarea>
-      </div>
-      <button class="btn-action" onclick="saveConfiguration()">💾 儲存並更新數據</button>
-    </section>
-
-  </div>
-
-  <script>
-    // 1. Default Word Data
-    const defaultData = [
-  { "word": "new", "pos": "adj.", "group": "ESL 1A", "chinese": "新的", "defEn": "not old; made or bought a short time ago", "example": "I have a new bag." },
-  { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的 / 老的", "defEn": "not new; having been here for a long time", "example": "This is my old bike." },
-  { "word": "play basketball", "pos": "v. phr.", "group": "ESL 1A", "chinese": "打籃球", "defEn": "to play a game with a ball and a basket", "example": "I play basketball with my friends." },
-  { "word": "play football", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢美式足球", "defEn": "to play a game with a ball and two teams", "example": "We play football at school." },
-  { "word": "play soccer", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢足球", "defEn": "to play a game where you kick a ball", "example": "They play soccer in the park." },
-  { "word": "teacher", "pos": "n.", "group": "ESL 1A", "chinese": "老師", "defEn": "a person who teaches children at school", "example": "My teacher is very nice." },
-  { "word": "see", "pos": "v.", "group": "ESL 1A", "chinese": "看見", "defEn": "to use your eyes to look at something", "example": "I can see a bird in the tree." },
-  { "word": "again", "pos": "adv.", "group": "ESL 1A", "chinese": "再一次", "defEn": "one more time", "example": "Please say it again." },
-  { "word": "count", "pos": "v.", "group": "ESL 1A", "chinese": "數數", "defEn": "to say numbers in order", "example": "I can count from one to ten." },
-  { "word": "really great", "pos": "phr.", "group": "ESL 1A", "chinese": "真的很棒", "defEn": "very good", "example": "The new game is really great." },
-  { "word": "in the forest", "pos": "phr.", "group": "ESL 1A", "chinese": "在森林裡", "defEn": "in a place with many trees", "example": "There are many animals in the forest." },
-  { "word": "afraid of", "pos": "adj. phr.", "group": "ESL 1A", "chinese": "對...感到害怕的", "defEn": "feeling scared of someone or something", "example": "I am afraid of big dogs." },
-  { "word": "student", "pos": "n.", "group": "ESL 1A", "chinese": "學生", "defEn": "a person who learns at school", "example": "She is a student at my school." },
-  { "word": "go home", "pos": "v. phr.", "group": "ESL 1A", "chinese": "回家", "defEn": "to go to the place where you live", "example": "I go home after school." },
-  { "word": "spell", "pos": "v.", "group": "ESL 1A", "chinese": "拼(字)", "defEn": "to say or write the letters in a word", "example": "Can you spell your name?" },
-
-  { "word": "whose", "pos": "pron.", "group": "ESL 2A", "chinese": "誰的", "defEn": "used to ask who something belongs to", "example": "Whose bag is this?" },
-  { "word": "hotel", "pos": "n.", "group": "ESL 2A", "chinese": "飯店旅館", "defEn": "a place where people can stay when they are away from home", "example": "We stay at a hotel." },
-  { "word": "know", "pos": "v.", "group": "ESL 2A", "chinese": "知道 / 認識", "defEn": "to have information about someone or something", "example": "I know her name." },
-  { "word": "skate", "pos": "v.", "group": "ESL 2A", "chinese": "溜冰", "defEn": "to move on ice wearing skates", "example": "I can skate on the ice." },
-  { "word": "fight about", "pos": "v. phr.", "group": "ESL 2A", "chinese": "爭執", "defEn": "to argue about something", "example": "The children fight about the toy." },
-  { "word": "an artist", "pos": "n.", "group": "ESL 2A", "chinese": "藝術家", "defEn": "a person who makes pictures or art", "example": "My aunt is an artist." },
-  { "word": "tidy up", "pos": "v. phr.", "group": "ESL 2A", "chinese": "收拾整理", "defEn": "to make a place clean and neat", "example": "Please tidy up your room." },
-  { "word": "son", "pos": "n.", "group": "ESL 2A", "chinese": "兒子", "defEn": "a boy or man who is someone's child", "example": "He is their son." },
-  { "word": "best friend", "pos": "n. phr.", "group": "ESL 2A", "chinese": "最好的朋友", "defEn": "the friend you like the most", "example": "Ben is my best friend." },
-  { "word": "thin", "pos": "adj.", "group": "ESL 2A", "chinese": "瘦的 / 薄的", "defEn": "not fat; not thick", "example": "The boy is thin." },
-  { "word": "become", "pos": "v.", "group": "ESL 2A", "chinese": "變成 / 成為", "defEn": "to start to be something", "example": "He wants to become a teacher." },
-  { "word": "sled", "pos": "n.", "group": "ESL 2A", "chinese": "雪橇", "defEn": "a thing you sit on to move over snow", "example": "The children ride on a sled in the snow." },
-  { "word": "a lot of trouble", "pos": "phr.", "group": "ESL 2A", "chinese": "許多的問題", "defEn": "many problems", "example": "The boy has a lot of trouble at school." },
-  { "word": "bring", "pos": "v.", "group": "ESL 2A", "chinese": "帶來", "defEn": "to take someone or something with you to a place", "example": "Please bring your book to school." },
-  { "word": "poor", "pos": "adj.", "group": "ESL 2A", "chinese": "貧窮的 / 可憐的", "defEn": "having very little money; making you feel sorry for someone", "example": "The poor family has very little money." },
-  { "word": "need", "pos": "v.", "group": "ESL 2A", "chinese": "需要", "defEn": "to have to have or do something", "example": "I need a pencil." },
-  { "word": "ask", "pos": "v.", "group": "ESL 2A", "chinese": "問", "defEn": "to say something because you want to know something", "example": "I ask my teacher a question." },
-
-  { "word": "Spanish", "pos": "adj.", "group": "ESL 3A", "chinese": "西班牙文 / 西班牙人的", "defEn": "from Spain, or the language spoken in Spain", "example": "My new classmate is Spanish, and she can speak both Spanish and English." },
-  { "word": "important", "pos": "adj.", "group": "ESL 3A", "chinese": "重要的", "defEn": "you need to think about or do carefully", "example": "It is important to check your school bag before you leave home in the morning." },
-  { "word": "before", "pos": "prep.", "group": "ESL 3A", "chinese": "...之前", "defEn": "earlier than a particular time or event", "example": "We need to arrive at school before eight o'clock." },
-  { "word": "plastic", "pos": "n.", "group": "ESL 3A", "chinese": "塑膠(的)", "defEn": "a light material used to make many things", "example": "This toy is made of plastic." },
-  { "word": "instead", "pos": "adv.", "group": "ESL 3A", "chinese": "作為替代", "defEn": "in place of someone or something else", "example": "It was raining outside, so we stayed home and played a board game instead." },
-  { "word": "brilliant", "pos": "adj.", "group": "ESL 3A", "chinese": "聰明的 / 棒的", "defEn": "very clever, very good, or exciting", "example": "Mia had a brilliant idea for our class project, and everyone wanted to try it." },
-  { "word": "competition", "pos": "n.", "group": "ESL 3A", "chinese": "競賽", "defEn": "an event in which people try to win", "example": "Our school is having a drawing competition, and the winner will get a small prize." },
-  { "word": "huge", "pos": "adj.", "group": "ESL 3A", "chinese": "龐大的", "defEn": "very big", "example": "We saw a huge ship at the harbor when we visited the city last weekend." },
-  { "word": "slide", "pos": "n.", "group": "ESL 3A", "chinese": "溜滑梯", "defEn": "a piece of playground equipment that you go down for fun", "example": "The children climbed up the steps and took turns going down the slide." },
-  { "word": "diving board", "pos": "n.", "group": "ESL 3A", "chinese": "跳水板", "defEn": "a board above a swimming pool that people jump from", "example": "The boy stood on the diving board for a moment before jumping into the pool." },
-  { "word": "pancake", "pos": "n.", "group": "ESL 3A", "chinese": "鬆餅", "defEn": "a thin, round food made from flour, eggs, and milk", "example": "Dad made warm pancakes for breakfast, and we ate them with fruit and honey." },
-  { "word": "strawberry", "pos": "n.", "group": "ESL 3A", "chinese": "草莓", "defEn": "a small, soft, red fruit with tiny seeds on the outside", "example": "We bought some strawberries at the market and added them to our fruit salad." },
-  { "word": "usually", "pos": "adv.", "group": "ESL 3A", "chinese": "通常", "defEn": "on most days or in most situations", "example": "I usually finish my homework before dinner, but today I have football practice." },
-  { "word": "text", "pos": "v.", "group": "ESL 3A", "chinese": "傳訊息給...", "defEn": "to send someone a short written message by phone", "example": "I will text you when I get home from school." },
-  { "word": "parking lot", "pos": "n.", "group": "ESL 3A", "chinese": "停車場", "defEn": "a place where people can leave their cars", "example": "We left our car in the parking lot near the supermarket and walked to the shops." },
-  { "word": "guess", "pos": "v.", "group": "ESL 3A", "chinese": "猜", "defEn": "to give an answer when you are not sure if it is correct", "example": "I did not know the answer, so I tried to guess it from the picture." },
-  { "word": "sound", "pos": "v.", "group": "ESL 3A", "chinese": "聽起來", "defEn": "to seem from what you hear", "example": "That music sounds beautiful to me." },
-
-  { "word": "land", "pos": "n.", "group": "ESL 4A", "chinese": "陸地 / 降落", "defEn": "the ground, not the sea; to come down to the ground", "example": "The plane landed safely at the airport just before the storm began." },
-  { "word": "Europe", "pos": "n.", "group": "ESL 4A", "chinese": "歐洲", "defEn": "a continent that includes countries such as France, Spain, and Italy", "example": "My family would like to travel around Europe and visit several countries one day." },
-  { "word": "river", "pos": "n.", "group": "ESL 4A", "chinese": "河流", "defEn": "a long, natural area of water that flows across the land", "example": "We walked beside the river and watched small boats moving across the water." },
-  { "word": "healthy", "pos": "adj.", "group": "ESL 4A", "chinese": "健康的", "defEn": "good for your body and helping you stay well", "example": "Eating fruit and vegetables and getting enough sleep can help you stay healthy." },
-  { "word": "moth", "pos": "n.", "group": "ESL 4A", "chinese": "蛾", "defEn": "an insect like a butterfly that usually flies at night", "example": "A small moth flew near the light when we opened the window at night." },
-  { "word": "mammal", "pos": "n.", "group": "ESL 4A", "chinese": "哺乳類動物", "defEn": "an animal whose babies drink milk from their mother", "example": "Dolphins are mammals even though they live and swim in the sea." },
-  { "word": "centimeter", "pos": "n.", "group": "ESL 4A", "chinese": "公分", "defEn": "a unit used for measuring length; one hundred centimeters make a meter", "example": "The little plant grew three centimeters taller during the school holiday." },
-  { "word": "solar system", "pos": "n.", "group": "ESL 4A", "chinese": "太陽系", "defEn": "the Sun and the planets and other objects that move around it", "example": "Earth is one of the planets in our solar system that moves around the Sun." },
-  { "word": "magazine", "pos": "n.", "group": "ESL 4A", "chinese": "雜誌", "defEn": "a thin book with pictures and stories that you can read", "example": "I found an interesting animal magazine in the library and read it after class." },
-  { "word": "keep away", "pos": "phr. v.", "group": "ESL 4A", "chinese": "使...遠離(不靠近)", "defEn": "to stay away from someone or something, or make someone stay away", "example": "Please keep away from the wet floor until it is clean and dry." },
-  { "word": "curl up", "pos": "phr. v.", "group": "ESL 4A", "chinese": "捲曲 / 捲起", "defEn": "to sit or lie with your body in a round shape", "example": "The little dog curled up beside the girl and went to sleep." },
-  { "word": "only", "pos": "adv.", "group": "ESL 4A", "chinese": "只有 / 唯一的", "defEn": "and no more than this; being the one person or thing of its kind", "example": "I only have one apple left, so I will save it for my lunch." },
-  { "word": "liquid", "pos": "n.", "group": "ESL 4A", "chinese": "液體 / 液態的", "defEn": "something that can flow and is not a solid or a gas", "example": "Water is a liquid, so it takes the shape of the bottle or cup it is in." },
-  { "word": "alien", "pos": "n.", "group": "ESL 4A", "chinese": "外星人", "defEn": "a creature from another planet, especially in a story or film", "example": "The children watched a funny film about an alien who came to Earth." },
-  { "word": "happen", "pos": "v.", "group": "ESL 4A", "chinese": "發生", "defEn": "to take place or become true, especially without being planned", "example": "Nobody knew what would happen next, so everyone waited quietly." },
-  { "word": "armadillo", "pos": "n.", "group": "ESL 4A", "chinese": "犰狳", "defEn": "a small animal with a hard covering that protects its body", "example": "Armadillos have a hard covering on their bodies that helps protect them." },
-  { "word": "porcupine", "pos": "n.", "group": "ESL 4A", "chinese": "豪豬", "defEn": "an animal with many long, sharp spikes on its body", "example": "A porcupine uses the sharp spikes on its body to help protect itself." },
-
-  { "word": "handsome", "pos": "adj.", "group": "ESL 5A", "chinese": "英俊的", "defEn": "good-looking, especially used to describe a man or boy", "example": "The handsome actor smiled at the children and signed their books after the show." },
-  { "word": "already", "pos": "adv.", "group": "ESL 5A", "chinese": "已經", "defEn": "before now, or sooner than expected", "example": "I have already finished my science project, so I can help you with yours this evening." },
-  { "word": "voice", "pos": "n.", "group": "ESL 5A", "chinese": "人的聲音", "defEn": "the sound that a person makes when speaking or singing", "example": "I recognized Emma immediately because her voice sounded exactly the same on the phone." },
-  { "word": "tofu dish", "pos": "n.", "group": "ESL 5A", "chinese": "豆腐菜餚", "defEn": "a dish that has tofu as one of its main ingredients", "example": "We ordered a tofu dish with vegetables because my sister wanted to try something different for dinner." },
-  { "word": "post", "pos": "v.", "group": "ESL 5A", "chinese": "郵寄 / 發文", "defEn": "to send a letter or package by mail; or put information on the Internet", "example": "Before you post a photo online, make sure it does not show any private information." },
-  { "word": "soft", "pos": "adj.", "group": "ESL 5A", "chinese": "柔軟的 / 輕柔的", "defEn": "not hard, rough, or firm; gentle and not loud or strong", "example": "The blanket is so soft and warm that the baby quickly fell asleep under it." },
-  { "word": "beef", "pos": "n.", "group": "ESL 5A", "chinese": "牛肉", "defEn": "meat that comes from a cow", "example": "Dad cooked beef with onions and vegetables for dinner, and everyone asked for a second helping." },
-  { "word": "unique", "pos": "adj.", "group": "ESL 5A", "chinese": "獨特的", "defEn": "different from everyone or everything else of the same type", "example": "Each snowflake has a unique shape, which means it is different from all the others." },
-  { "word": "honest", "pos": "adj.", "group": "ESL 5A", "chinese": "誠實的", "defEn": "telling the truth and not trying to deceive people", "example": "Please be honest with me and tell me what really happened to the broken classroom window." },
-  { "word": "leather", "pos": "n.", "group": "ESL 5A", "chinese": "皮革", "defEn": "material made from animal skin and used for making things such as shoes, bags, and belts", "example": "My uncle has an old leather bag that he has used for work for more than ten years." },
-  { "word": "thunder", "pos": "n.", "group": "ESL 5A", "chinese": "打雷", "defEn": "the loud sound that you hear in the sky during a storm", "example": "We heard a loud clap of thunder just before the heavy rain began to fall." },
-  { "word": "tradition", "pos": "n.", "group": "ESL 5A", "chinese": "傳統", "defEn": "a custom or way of doing something that has continued for a long time", "example": "It is a family tradition to make dumplings together on the evening before the New Year." },
-  { "word": "staff", "pos": "n.", "group": "ESL 5A", "chinese": "全體員工", "defEn": "all the people who work for a company, school, shop, or other organization", "example": "The hotel staff were friendly and helped us find our room as soon as we arrived." },
-  { "word": "attend", "pos": "v.", "group": "ESL 5A", "chinese": "參加", "defEn": "to go to an event, school, meeting, or class", "example": "More than two hundred students attended the school festival and enjoyed the games and performances." },
-
-  { "word": "fashion", "pos": "n.", "group": "ESL 6A", "chinese": "時尚", "defEn": "a popular style of clothes, hair, or appearance", "example": "Fashion changes over time, so clothes that are popular today may look very different in the future." },
-  { "word": "button", "pos": "n.", "group": "ESL 6A", "chinese": "鈕扣 / 按鈕", "defEn": "a small round object on clothes used to fasten them; or a button on a machine", "example": "Press the green button on the machine when you are ready to start it." },
-  { "word": "benefit", "pos": "n.", "group": "ESL 6A", "chinese": "益處 / 利益", "defEn": "a good or helpful result that you get from something", "example": "One benefit of walking to school is that you can get some exercise every morning." },
-  { "word": "passage", "pos": "n.", "group": "ESL 6A", "chinese": "文章", "defEn": "a piece of writing in a book, test, or other text", "example": "Read the passage carefully before you answer the questions at the bottom of the page." },
-  { "word": "predator", "pos": "n.", "group": "ESL 6A", "chinese": "掠食者 / 天敵", "defEn": "an animal that hunts and eats other animals", "example": "A lion is a powerful predator that hunts other animals for food in the wild." },
-  { "word": "therefore", "pos": "adv.", "group": "ESL 6A", "chinese": "因此 / 所以", "defEn": "for that reason; because of what was just said", "example": "The road was closed because of heavy rain; therefore, we had to take a different way home." },
-  { "word": "improve", "pos": "v.", "group": "ESL 6A", "chinese": "改善 / 進步", "defEn": "to make something better or become better", "example": "Reading English books every day can improve your vocabulary and help you learn new words." },
-  { "word": "professional", "pos": "adj.", "group": "ESL 6A", "chinese": "專業的", "defEn": "connected with a job that needs special training or skill", "example": "The photos were taken by a professional photographer who has worked in this field for many years." },
-  { "word": "memory", "pos": "n.", "group": "ESL 6A", "chinese": "記憶 / 記憶體", "defEn": "the ability to remember things; or part of a computer device", "example": "My phone does not have enough memory, so I need to delete some old photos and videos." },
-  { "word": "include", "pos": "v.", "group": "ESL 6A", "chinese": "包括", "defEn": "to have someone or something as part of a group or thing", "example": "The price of the school trip includes lunch, a bus ticket, and a visit to the museum." },
-  { "word": "promote", "pos": "v.", "group": "ESL 6A", "chinese": "促進 / 推廣 / 升遷", "defEn": "to help something develop, advertise something, or give someone a higher job", "example": "Regular exercise can promote good health and help people feel stronger and more active." },
-  { "word": "brain", "pos": "n.", "group": "ESL 6A", "chinese": "腦袋 / 腦部", "defEn": "the part inside your head that helps you think, learn, and control your body", "example": "She hit her head during the game, so the doctor checked to make sure her brain was not injured." },
-  { "word": "function", "pos": "v.", "group": "ESL 6A", "chinese": "運作 / 功能", "defEn": "to work or operate in the correct way; or the purpose of something", "example": "The machine cannot function properly if one of its important parts is broken." },
-  { "word": "spinach", "pos": "n.", "group": "ESL 6A", "chinese": "菠菜", "defEn": "a green vegetable with soft leaves", "example": "My mother often puts spinach in our soup because it is a healthy green vegetable." },
-  { "word": "bones and muscles", "pos": "n. phr.", "group": "ESL 6A", "chinese": "骨頭和肌肉", "defEn": "the hard parts inside your body and the parts that help your body move", "example": "Exercise can help keep your bones and muscles strong, especially when you are growing." },
-  { "word": "strengthen", "pos": "v.", "group": "ESL 6A", "chinese": "強化 / 加強", "defEn": "to make someone or something stronger", "example": "Regular exercise can strengthen your muscles and help your body stay healthy and active." },
-  { "word": "squid", "pos": "n.", "group": "ESL 6A", "chinese": "魷魚", "defEn": "a sea animal with a long soft body and several arms", "example": "A squid lives in the sea and can move quickly through the water when it is in danger." },
-  { "word": "surface", "pos": "n.", "group": "ESL 6A", "chinese": "表面", "defEn": "the outside or top part of something", "example": "The surface of the table was wet, so I cleaned it with a dry cloth before putting my books down." },
-  { "word": "giant", "pos": "adj.", "group": "ESL 6A", "chinese": "巨大 / 龐大的", "defEn": "very large", "example": "We saw a giant tree in the forest that was much taller than all the other trees." },
-  { "word": "South America", "pos": "n.", "group": "ESL 6A", "chinese": "南美洲", "defEn": "a continent that is south of North America", "example": "Brazil is a large country in South America, and many people there speak Portuguese." },
-  { "word": "access", "pos": "v.", "group": "ESL 6A", "chinese": "存取 / 登入進入", "defEn": "the ability or right to enter a place or use something", "example": "You need a password to access your school account and read the information online." },
-  { "word": "orchestra", "pos": "n.", "group": "ESL 6A", "chinese": "管弦樂團", "defEn": "a large group of musicians who play different instruments together", "example": "The school orchestra played several beautiful songs while parents and students listened quietly." },
-  { "word": "text message", "pos": "n.", "group": "ESL 6A", "chinese": "簡訊 / 訊息", "defEn": "a short written message sent from one phone or device to another", "example": "I sent my mother a text message to tell her that I would arrive home a little later than usual." },
-  { "word": "textbook", "pos": "n.", "group": "ESL 6A", "chinese": "課本", "defEn": "a book used for studying a school subject", "example": "Our science textbook has many pictures and activities that help us understand each lesson more easily." }
-];
-
-    // State
-    let wordDatabase = [];
-    let currentGroupList = [];
-    let currentIndex = 0;
-    let currentWordObj = null;
-    let currentTab = 'learn';
-    let availableVoices = [];
-
-    // Puzzle State
-    let puzzleUserSelection = [];
-
-    // 2. Initialization
-    window.addEventListener('DOMContentLoaded', () => {
-      loadDatabase();
-      initSpeechAPI();
-      renderGroupOptions();
-      onGroupChange();
-      
-      // Auto-focus dictation input on Enter key
-      document.getElementById('dict-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') checkDictation();
-      });
-    });
-
-    // 3. Load / Save Database
-   function loadDatabase() {
-    wordDatabase = defaultData;
-    localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
-    if (document.getElementById('jsonInput')) {
-        document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
-    }
-}
-
-    function saveConfiguration() {
-      const rawText = document.getElementById('jsonInput').value;
-      try {
-        const parsed = JSON.parse(rawText);
-        if (!Array.isArray(parsed)) throw new Error("JSON 必須是陣列格式");
-        wordDatabase = parsed;
-        localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
-        alert('儲存成功！');
-        renderGroupOptions();
-        onGroupChange();
-      } catch (err) {
-        alert('JSON 格式錯誤：' + err.message);
-      }
-    }
-
-    // 4. Web Speech API (Voices)
-    function initSpeechAPI() {
-      if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = populateVoiceList;
-        populateVoiceList();
-      }
-    }
-
-    function populateVoiceList() {
-      if (!('speechSynthesis' in window)) return;
-      availableVoices = window.speechSynthesis.getVoices();
-      const select = document.getElementById('voiceSelect');
-      select.innerHTML = '';
-
-      let defaultIdx = 0;
-      availableVoices.forEach((voice, index) => {
-        const option = document.createElement('option');
-        option.textContent = `${voice.name} (${voice.lang})`;
-        option.value = index;
-        select.appendChild(option);
-
-        // Priority Voice Match
-        if (voice.name.includes("Google UK English Male") || 
-            voice.name.includes("Google en-US") || 
-            (voice.lang.startsWith("en") && defaultIdx === 0)) {
-          defaultIdx = index;
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌸 小學館全美語 ESL</title>
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5a623;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
         }
-      });
 
-      if (availableVoices.length > 0) {
-        select.selectedIndex = defaultIdx;
-      }
-    }
-
-    function speakText(text) {
-      if (!('speechSynthesis' in window) || !text) return;
-      window.speechSynthesis.cancel(); // Stop current speech
-      const utterance = new SpeechSynthesisUtterance(text);
-      const voiceIdx = document.getElementById('voiceSelect').value;
-      if (availableVoices[voiceIdx]) {
-        utterance.voice = availableVoices[voiceIdx];
-      }
-      utterance.rate = 0.9; // Slightly slower for kids
-      window.speechSynthesis.speak(utterance);
-    }
-
-    function speakCurrentWord() {
-      if (currentWordObj) speakText(currentWordObj.word);
-    }
-
-    // 5. Data Filtering & Navigation
-    function renderGroupOptions() {
-      const groups = [...new Set(wordDatabase.map(item => item.group || "預設包裹"))];
-      const select = document.getElementById('groupSelect');
-      select.innerHTML = '';
-      groups.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g;
-        opt.textContent = g;
-        select.appendChild(opt);
-      });
-    }
-
-    function onGroupChange() {
-      const selectedGroup = document.getElementById('groupSelect').value;
-      currentGroupList = wordDatabase.filter(item => (item.group || "預設包裹") === selectedGroup);
-      currentIndex = 0;
-      updateUI();
-    }
-
-    function prevWord() {
-      if (currentGroupList.length === 0) return;
-      currentIndex = (currentIndex - 1 + currentGroupList.length) % currentGroupList.length;
-      updateUI();
-    }
-
-    function nextWord() {
-      if (currentGroupList.length === 0) return;
-      currentIndex = (currentIndex + 1) % currentGroupList.length;
-      updateUI();
-    }
-
-    // 6. UI Render Control
-    function updateUI() {
-      if (currentGroupList.length === 0) return;
-      currentWordObj = currentGroupList[currentIndex];
-
-      // Update Progress
-      const progressText = `${currentIndex + 1} / ${currentGroupList.length}`;
-      document.getElementById('learn-progress').textContent = progressText;
-      document.getElementById('dict-progress').textContent = progressText;
-      document.getElementById('puz-progress').textContent = progressText;
-
-      // Update POS Badge Color
-      updatePosBadge('learn-pos', currentWordObj.pos);
-      updatePosBadge('dict-pos', currentWordObj.pos);
-
-      // Render Tab A: Learn
-      document.getElementById('learn-word').textContent = currentWordObj.word;
-      document.getElementById('learn-chinese').textContent = currentWordObj.chinese;
-      document.getElementById('learn-defEn').textContent = currentWordObj.defEn;
-      document.getElementById('learn-example').textContent = currentWordObj.example;
-
-      // Render Tab B: Dictation
-      document.getElementById('dict-chinese').textContent = currentWordObj.chinese;
-      document.getElementById('dict-defEn').textContent = currentWordObj.defEn;
-      document.getElementById('dict-example').textContent = currentWordObj.example;
-      document.getElementById('dict-input').value = '';
-      document.getElementById('dict-feedback').textContent = '';
-      document.getElementById('dict-feedback').className = 'feedback-msg';
-      document.getElementById('dict-example-box').style.display = 'none';
-
-      // Render Tab C: Puzzle
-      document.getElementById('puz-chinese').textContent = currentWordObj.chinese;
-      document.getElementById('puz-defEn').textContent = currentWordObj.defEn;
-      document.getElementById('puz-feedback').textContent = '';
-      document.getElementById('puz-feedback').className = 'feedback-msg';
-      initPuzzle();
-
-      // Audio Trigger for Dictation Mode
-      if (currentTab === 'dictation') {
-        speakCurrentWord();
-      }
-    }
-
-    function updatePosBadge(elementId, posText) {
-      const badge = document.getElementById(elementId);
-      badge.textContent = posText || '';
-      badge.className = 'pos-badge ';
-      
-      const cleanPos = (posText || '').toLowerCase().replace('.', '');
-      if (['n', 'noun'].includes(cleanPos)) badge.classList.add('pos-n');
-      else if (['adj', 'adjective'].includes(cleanPos)) badge.classList.add('pos-adj');
-      else if (['v', 'verb'].includes(cleanPos)) badge.classList.add('pos-v');
-      else if (['adv', 'adverb'].includes(cleanPos)) badge.classList.add('pos-adv');
-      else badge.classList.add('pos-default');
-    }
-
-    // 7. Tabs Switching
-    function switchTab(tabName) {
-      currentTab = tabName;
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-      event.currentTarget.classList.add('active');
-      document.getElementById(`tab-${tabName}`).classList.add('active');
-
-      if (tabName === 'dictation') {
-        speakCurrentWord();
-      }
-    }
-
-    // 8. Dictation Logic
-    function checkDictation() {
-      const input = document.getElementById('dict-input').value.trim().toLowerCase();
-      const target = currentWordObj.word.trim().toLowerCase();
-      const feedback = document.getElementById('dict-feedback');
-
-      if (input === target) {
-        feedback.textContent = '🎉 太棒了！答對了！';
-        feedback.className = 'feedback-msg feedback-success';
-        document.getElementById('dict-example-box').style.display = 'flex';
-        speakText('Great job! ' + currentWordObj.word);
-      } else {
-        feedback.textContent = '❌ 再試一次哦！';
-        feedback.className = 'feedback-msg feedback-error';
-      }
-    }
-
-    function showDictationHint() {
-      if (!currentWordObj) return;
-      const firstLetter = currentWordObj.word.charAt(0);
-      document.getElementById('dict-input').value = firstLetter;
-      document.getElementById('dict-input').focus();
-    }
-
-    // 9. Word Puzzle Logic
-    let shuffledLetters = [];
-
-    function initPuzzle() {
-      if (!currentWordObj) return;
-      puzzleUserSelection = [];
-      const word = currentWordObj.word.replace(/\s+/g, ''); // Clear spaces for puzzle
-      
-      // Shuffle Array
-      shuffledLetters = word.split('').map((char, id) => ({ char, id }));
-      for (let i = shuffledLetters.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledLetters[i], shuffledLetters[j]] = [shuffledLetters[j], shuffledLetters[i]];
-      }
-
-      renderPuzzleBoard();
-    }
-
-    function renderPuzzleBoard() {
-      const slotsContainer = document.getElementById('puz-slots');
-      const tilesContainer = document.getElementById('puz-tiles');
-      slotsContainer.innerHTML = '';
-      tilesContainer.innerHTML = '';
-
-      const targetLen = currentWordObj.word.replace(/\s+/g, '').length;
-
-      // Render Selected Slots
-      for (let i = 0; i < targetLen; i++) {
-        const btn = document.createElement('button');
-        btn.className = 'letter-btn';
-        if (puzzleUserSelection[i]) {
-          btn.textContent = puzzleUserSelection[i].char;
-          btn.onclick = () => unselectLetter(i);
-        } else {
-          btn.classList.add('empty');
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
         }
-        slotsContainer.appendChild(btn);
-      }
 
-      // Render Available Letter Tiles
-      shuffledLetters.forEach((item) => {
-        const isSelected = puzzleUserSelection.some(selected => selected.id === item.id);
-        if (!isSelected) {
-          const btn = document.createElement('button');
-          btn.className = 'letter-btn';
-          btn.textContent = item.char;
-          btn.onclick = () => selectLetter(item);
-          tilesContainer.appendChild(btn);
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
         }
-      });
-    }
 
-    function selectLetter(item) {
-      puzzleUserSelection.push(item);
-      renderPuzzleBoard();
-    }
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
 
-    function unselectLetter(index) {
-      puzzleUserSelection.splice(index, 1);
-      renderPuzzleBoard();
-    }
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
 
-    function resetPuzzle() {
-      puzzleUserSelection = [];
-      document.getElementById('puz-feedback').textContent = '';
-      document.getElementById('puz-feedback').className = 'feedback-msg';
-      renderPuzzleBoard();
-    }
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+            margin-bottom: 20px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
 
-    function checkPuzzle() {
-      const userWord = puzzleUserSelection.map(item => item.char).join('').toLowerCase();
-      const targetWord = currentWordObj.word.replace(/\s+/g, '').toLowerCase();
-      const feedback = document.getElementById('puz-feedback');
+        select, button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+            cursor: pointer;
+        }
 
-      if (userWord === targetWord) {
-        feedback.textContent = '🌟 拼對了！你真棒！';
-        feedback.className = 'feedback-msg feedback-success';
-        speakCurrentWord();
-      } else {
-        feedback.textContent = '💪 還差一點點，再試試看！';
-        feedback.className = 'feedback-msg feedback-error';
-      }
-    }
-  </script>
-</body>
-</html>
+        .nav-tabs {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .nav-btn {
+            background-color: #e0e0e0;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-btn.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .tab-content {
+            display:
