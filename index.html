@@ -91,7 +91,6 @@
             display: block;
         }
 
-        /* 學習卡片樣式 */
         .grid-container {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -162,7 +161,6 @@
             color: var(--secondary-color);
         }
 
-        /* 測驗樣式 */
         .quiz-card {
             background: white;
             padding: 30px;
@@ -225,8 +223,7 @@
     <div class="nav-tabs">
         <button class="nav-btn active" onclick="switchTab('learn')">📖 學習</button>
         <button class="nav-btn" onclick="switchTab('quiz')">🧩 測驗</button>
-        <!-- ⚙️ 設定頁面已隱藏，僅管理員可在程式碼中開啟 -->
-        <!-- <button class="nav-btn" onclick="switchTab('settings')">⚙️ 設定</button> -->
+        <!-- ⚙️ 設定頁面已隱藏 -->
     </div>
 
     <!-- 學習分頁 -->
@@ -244,7 +241,7 @@
         </div>
     </div>
 
-    <!-- 設定分頁 (預設隱藏) -->
+    <!-- 設定分頁 (隱藏) -->
     <div id="settingsTab" class="tab-content">
         <div class="setting-box">
             <h3>JSON 單字庫數據編輯：</h3>
@@ -254,98 +251,209 @@
         </div>
     </div>
 
-    <script>
-        // 內建完整 ESL 1A ~ 6A 單字資料
-        const defaultData = [
-          { "word": "new", "pos": "adj.", "group": "ESL 1A", "chinese": "新的", "defEn": "not old; made or bought a short time ago", "example": "I have a new bag." },
-          { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的 / 老的", "defEn": "not new; having been here for a long time", "example": "This is my old bike." },
-          { "word": "play basketball", "pos": "v. phr.", "group": "ESL 1A", "chinese": "打籃球", "defEn": "to play a game with a ball and a basket", "example": "I play basketball with my friends." },
-          { "word": "play football", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢美式足球", "defEn": "to play a game with a ball and two teams", "example": "We play football at school." },
-          { "word": "play soccer", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢足球", "defEn": "to play a game where you kick a ball", "example": "They play soccer in the park." },
-          { "word": "teacher", "pos": "n.", "group": "ESL 1A", "chinese": "老師", "defEn": "a看了一下你目前開啟的 [index.html](https://github.com/bai19930104-sketch/-ESL/blob/main/index.html) 編輯畫面，因為檔案內被清空了，所以網頁才會顯示一片空白。
+<script>
+// 內建完整 ESL 1A ~ 6A 單字資料
+const defaultData = [
+  { "word": "new", "pos": "adj.", "group": "ESL 1A", "chinese": "新的", "defEn": "not old; made or bought a short time ago", "example": "I have a new bag." },
+  { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的 / 老的", "defEn": "not new; having been here for a long time", "example": "This is my old bike." },
+  { "word": "play basketball", "pos": "v. phr.", "group": "ESL 1A", "chinese": "打籃球", "defEn": "to play a game with a ball and a basket", "example": "I play basketball with my friends." },
+  { "word": "play football", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢美式足球", "defEn": "to play a game with a ball and two teams", "example": "We play football at school." },
+  { "word": "play soccer", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢足球", "defEn": "to play a game where you kick a ball", "example": "They play soccer in the park." },
+  { "word": "teacher", "pos": "n.", "group": "ESL 1A", "chinese": "老師", "defEn": "a person who teaches children at school", "example": "My teacher is very nice." },
+  { "word": "whose", "pos": "pron.", "group": "ESL 2A", "chinese": "誰的", "defEn": "used to ask who something belongs to", "example": "Whose bag is this?" },
+  { "word": "hotel", "pos": "n.", "group": "ESL 2A", "chinese": "飯店旅館", "defEn": "a place where people can stay when they are away from home", "example": "We stay at a hotel." },
+  { "word": "Spanish", "pos": "adj.", "group": "ESL 3A", "chinese": "西班牙文 / 西班牙人的", "defEn": "from Spain, or the language spoken in Spain", "example": "My new classmate is Spanish." },
+  { "word": "important", "pos": "adj.", "group": "ESL 3A", "chinese": "重要的", "defEn": "you need to think about or do carefully", "example": "It is important to check your bag." },
+  { "word": "land", "pos": "n.", "group": "ESL 4A", "chinese": "陸地 / 降落", "defEn": "the ground, not the sea; to come down to the ground", "example": "The plane landed safely." },
+  { "word": "Europe", "pos": "n.", "group": "ESL 4A", "chinese": "歐洲", "defEn": "a continent that includes countries such as France and Spain", "example": "We want to travel to Europe." },
+  { "word": "dinosaur", "pos": "n.", "group": "ESL 5A", "chinese": "恐龍", "defEn": "a large reptile that lived millions of years ago", "example": "We saw a dinosaur skeleton at the museum." },
+  { "word": "textbook", "pos": "n.", "group": "ESL 6A", "chinese": "課本", "defEn": "a book used for studying a school subject", "example": "Our science textbook has many pictures." }
+];
 
-這裡為你整理好**完整的 HTML 原始碼**（內含 **ESL 1A ~ 6A 的完整單字庫**、**隱藏設定按鈕**以及**強制讀取最新單字**的邏輯）。請直接複製下方整段程式碼，貼回 GitHub 的編輯框中：
+let wordDatabase = [];
+let currentQuizIndex = 0;
+let currentQuizAnswer = '';
 
-```html
-<!DOCTYPE html>
-<html lang="zh-TW">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 小學館全美語 ESL</title>
-    <style>
-        :root {
-            --primary-color: #4a90e2;
-            --secondary-color: #f5a623;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-            --text-color: #333;
+// 初始化語音選單
+function populateVoiceList() {
+    if (typeof speechSynthesis === 'undefined') return;
+    const voices = speechSynthesis.getVoices();
+    const voiceSelect = document.getElementById('voiceSelect');
+    voiceSelect.innerHTML = '';
+    
+    voices.forEach((voice) => {
+        const option = document.createElement('option');
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.setAttribute('data-lang', voice.lang);
+        option.setAttribute('data-name', voice.name);
+        if (voice.lang.includes('en')) option.selected = true;
+        voiceSelect.appendChild(option);
+    });
+}
+
+populateVoiceList();
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoiceList;
+}
+
+function speak(text) {
+    if (typeof speechSynthesis === 'undefined') return;
+    const utterance = new SpeechSynthesisUtterance(text);
+    const voiceSelect = document.getElementById('voiceSelect');
+    const selectedOption = voiceSelect.selectedOptions[0];
+    if (selectedOption) {
+        const voices = speechSynthesis.getVoices();
+        utterance.voice = voices.find(v => v.name === selectedOption.getAttribute('data-name'));
+    }
+    speechSynthesis.speak(utterance);
+}
+
+// 載入資料庫（直接強制使用 defaultData）
+function loadDatabase() {
+    wordDatabase = defaultData;
+    localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
+    if (document.getElementById('jsonInput')) {
+        document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
+    }
+}
+
+function saveDatabase() {
+    try {
+        const input = document.getElementById('jsonInput').value;
+        wordDatabase = JSON.parse(input);
+        localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
+        alert('儲存成功！');
+        initApp();
+    } catch (e) {
+        alert('JSON 格式錯誤，請檢查！');
+    }
+}
+
+// 分頁切換
+function switchTab(tabName) {
+    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+    if (tabName === 'learn') {
+        document.querySelectorAll('.nav-btn')[0].classList.add('active');
+        document.getElementById('learnTab').classList.add('active');
+    } else if (tabName === 'quiz') {
+        document.querySelectorAll('.nav-btn')[1].classList.add('active');
+        document.getElementById('quizTab').classList.add('active');
+        initQuiz();
+    } else if (tabName === 'settings') {
+        document.getElementById('settingsTab').classList.add('active');
+    }
+}
+
+// 下拉選單填充
+function populateGroupFilter() {
+    const select = document.getElementById('groupSelect');
+    const groups = [...new Set(wordDatabase.map(item => item.group))].sort();
+    select.innerHTML = '<option value="ALL">全部顯示</option>';
+    groups.forEach(group => {
+        const opt = document.createElement('option');
+        opt.value = group;
+        opt.textContent = group;
+        select.appendChild(opt);
+    });
+}
+
+function filterData() {
+    renderCards();
+}
+
+// 渲染學習卡片
+function renderCards() {
+    const grid = document.getElementById('cardGrid');
+    const selectedGroup = document.getElementById('groupSelect').value;
+    grid.innerHTML = '';
+
+    const filtered = selectedGroup === 'ALL' 
+        ? wordDatabase 
+        : wordDatabase.filter(item => item.group === selectedGroup);
+
+    filtered.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
+            <div>
+                <div class="word-title">
+                    <span>${item.word}</span>
+                    <button class="audio-btn" onclick="speak('${item.word.replace(/'/g, "\\'")}')">🔊</button>
+                </div>
+                <div class="pos">${item.pos || ''}</div>
+                <div class="chinese">${item.chinese}</div>
+                <div class="def-en">${item.defEn || ''}</div>
+            </div>
+            <div class="example">${item.example || ''}</div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+// 測驗功能
+function initQuiz() {
+    nextQuiz();
+}
+
+function nextQuiz() {
+    document.getElementById('quizFeedback').textContent = '';
+    const selectedGroup = document.getElementById('groupSelect').value;
+    const pool = selectedGroup === 'ALL' 
+        ? wordDatabase 
+        : wordDatabase.filter(item => item.group === selectedGroup);
+
+    if (pool.length === 0) {
+        document.getElementById('quizQuestion').textContent = '該群組尚無資料';
+        document.getElementById('quizOptions').innerHTML = '';
+        return;
+    }
+
+    const current = pool[Math.floor(Math.random() * pool.length)];
+    currentQuizAnswer = current.chinese;
+    document.getElementById('quizQuestion').textContent = current.word;
+
+    // 隨機選項
+    let options = [current.chinese];
+    while (options.length < 4 && options.length < pool.length) {
+        const randomItem = pool[Math.floor(Math.random() * pool.length)];
+        if (!options.includes(randomItem.chinese)) {
+            options.push(randomItem.chinese);
         }
+    }
+    options.sort(() => Math.random() - 0.5);
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
+    const optionsContainer = document.getElementById('quizOptions');
+    optionsContainer.innerHTML = '';
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt-btn';
+        btn.textContent = opt;
+        btn.onclick = () => checkQuiz(opt);
+        optionsContainer.appendChild(btn);
+    });
+}
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
+function checkQuiz(selected) {
+    const feedback = document.getElementById('quizFeedback');
+    if (selected === currentQuizAnswer) {
+        feedback.textContent = '🎉 正確！非常棒！';
+        feedback.style.color = 'green';
+    } else {
+        feedback.textContent = `❌ 答錯囉！正確答案是：${currentQuizAnswer}`;
+        feedback.style.color = 'red';
+    }
+}
 
-        header {
-            text-align: center;
-            margin-bottom: 20px;
-        }
+// 主初始化程序
+function initApp() {
+    loadDatabase();
+    populateGroupFilter();
+    renderCards();
+}
 
-        h1 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
-        }
-
-        .controls {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            align-items: center;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-
-        select, button {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: 1px solid #ccc;
-            font-size: 16px;
-            cursor: pointer;
-        }
-
-        .nav-tabs {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin-bottom: 20px;
-        }
-
-        .nav-btn {
-            background-color: #e0e0e0;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            transition: all 0.3s;
-        }
-
-        .nav-btn.active {
-            background-color: var(--primary-color);
-            color: white;
-        }
-
-        .tab-content {
-            display:
+window.onload = initApp;
+</script>
+</body>
+</html>
