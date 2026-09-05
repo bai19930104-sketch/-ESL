@@ -1,58 +1,772 @@
-text你是一位資深的 Front-end 網頁工程師與 UI/UX 設計師。請幫我用單一 HTML 檔案（整合 HTML、CSS 與 JavaScript）製作一個名為「小學館全美語ESL」的單字學習網頁 Web App。
+```html
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌸 小學館全美語 ESL</title>
+  <style>
+    :root {
+      --bg-color: #F7F9FC;
+      --card-bg: #FFFFFF;
+      --primary-blue: #E3F2FD;
+      --primary-blue-dark: #90CAF9;
+      --accent-green: #E8F5E9;
+      --accent-green-dark: #A5D6A7;
+      --accent-yellow: #FFFDE7;
+      --accent-yellow-dark: #FFF59D;
+      --accent-pink: #FFEBEE;
+      --accent-pink-dark: #EF9A9A;
+      --text-main: #37474F;
+      --text-muted: #78909C;
+      --shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+      --radius-lg: 20px;
+      --radius-md: 12px;
+      --radius-sm: 8px;
+    }
 
-請完整實現以下的所有功能與視覺要求，並確保程式碼立即可執行、沒有任何省略或 Todo 註解。
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, 'Noto Sans TC';
+    }
 
-### 1. 視覺與 UI 風格 (CSS 要求)
-- **主題風格**：可愛活潑、乾淨明亮、充滿童趣的學習風格。標題寫著「🌸 小學館全美語 ESL」。
-- **色彩計畫**：使用溫柔的粉嫩色系（如粉藍 #E3F2FD、粉綠 #E8F5E9、粉黃 #FFFDE7、馬卡龍粉紅作為點綴），搭配圓角（border-radius: 12px+）與微陰影，營造無壓力的兒童學習環境。
-- **響應式設計**：需完美適應手機、平板與電腦螢幕。
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
 
-### 2. 頂部選單 (Header 控制區)
-- **下拉選單 1 (包裹選擇)**：動態讀取目前的單字庫，列出所有可選的「包裹名稱」（如：包裹 1、包裹 2），切換時會同步更新下方所有分頁的單字內容。
-- **下拉選單 2 (語音選擇)**：使用瀏覽器原生 Web Speech API (SpeechSynthesis)，自動抓取可用語音清單，預設優先選取包含 "Google UK English Male"、"Google en-US" 或任何 "en-" 開頭的英文語音。
+    .app-container {
+      width: 100%;
+      max-width: 650px;
+      background: var(--card-bg);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
-### 3. 頁面功能頁籤 (Tabs 互動邏輯)
-請用 CSS/JS 實作頁籤切換（學習、聽寫、拼圖/填空、設定），點擊時只切換顯示對應的區塊。
+    /* Header & Selectors */
+    header {
+      text-align: center;
+    }
 
-#### 頁籤 A：【學習】(Flashcards)
-- 顯示大大的「單字卡」，中央展示單字、詞性標籤（如 adj.、n. 用不同顏色底色標記）。
-- 包含一個大大的「喇叭圖示按鈕」，點擊會播放該單字發音。
-- 顯示中文意思。
-- 顯示英文解釋（旁邊附帶獨立播放按鈕，點擊只朗讀英文解釋文字）。
-- 顯示生活化例句（旁邊附帶獨立播放按鈕，點擊只朗讀例句文字）。
-- 底部提供「⬅️ 上一個」與「下一個 ➡️」按鈕，並顯示目前進度（例如：3 / 10）。
+    h1 {
+      font-size: 1.8rem;
+      color: #263238;
+      margin-bottom: 16px;
+    }
 
-#### 頁籤 B：【聽寫】(Dictation)
-- 進入此模式或切換單字時，自動播放當前單字的語音（並提供一個「再聽一次」按鈕）。
-- 畫面不顯示單字，但會顯示詞性、中文意思、英文解釋作為提示。
-- 提供一個輸入框（Input）讓學生鍵入英文單字。
-- 提供「檢查答案」按鈕。比對時忽略大小寫與前後空格：
-  - 若答對，顯示大大的「🎉 太棒了！」綠色打勾，並自動顯示英文例句。
-  - 若答錯，顯示「❌ 再試一次哦！」，並提供「顯示提示（顯示第一個字母）」的按鈕。
-- 提供「下一個」按鈕挑戰下一題。
+    .controls-bar {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-#### 頁籤 C：【拼圖 / 填空】(Word Puzzle)
-- 畫面顯示當前單字的中文意思與英文解釋。
-- 將當前單字的字母順序「打亂（Shuffle）」，以一個個「可愛的字母方塊按鈕」呈現。
-- 提供一個空的格子區。學生點擊打亂的字母方塊時，字母會依序填入格子中。
-- 提供「清除重來」按鈕與「檢查」按鈕。
-- 答對時彈出可愛的成功動畫或提示。
+    .control-group {
+      flex: 1;
+      min-width: 140px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      text-align: left;
+    }
 
-#### 頁籤 D：【設定】(Configuration)
-- 提供一個大文字框（Textarea），預設呈現目前正在執行的 JSON 數據。
-- 使用者可以在此貼上全新的 JSON 單字庫。
-- 提供「儲存並更新」按鈕，點擊後會使用 LocalStorage 將數據儲存在瀏覽器中，並自動重新整理網頁、更新頂部的包裹選單與所有學習內容。
+    .control-group label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: bold;
+    }
 
-### 4. 預設測試資料 (JavaScript 內建)
-請在 JavaScript 程式碼中，預設宣告一組符合以下結構的 JSON 陣列變數（至少包含兩個不同的包裹，方便測試切換功能）：
-```json
-[
-  {"word": "sea", "pos": "n.", "group": "包裹 1", "chinese": "大海", "defEn": "The big blue water.", "example": "Fish live in the sea."},
-  {"word": "cold", "pos": "adj.", "group": "包裹 1", "chinese": "冰涼的", "defEn": "Not hot; like ice.", "example": "The ice cream is very cold."},
-  {"word": "where", "pos": "adv.", "group": "包裹 2", "chinese": "在哪裡", "defEn": "What place.", "example": "Where is my teddy bear?"},
-  {"word": "biggest", "pos": "adj.", "group": "包裹 2", "chinese": "最大的", "defEn": "More big than all others.", "example": "The elephant is the biggest animal."}
-]
+    select, button, input, textarea {
+      font-size: 1rem;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      border: 2px solid #E0E0E0;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    select:focus, input:focus, textarea:focus {
+      border-color: var(--primary-blue-dark);
+    }
+
+    button {
+      cursor: pointer;
+      background-color: var(--primary-blue);
+      border: none;
+      font-weight: bold;
+      color: var(--text-main);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    button:hover {
+      filter: brightness(0.95);
+      transform: translateY(-1px);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* Tabs Nav */
+    .tabs-nav {
+      display: flex;
+      background: #F0F4F8;
+      padding: 6px;
+      border-radius: var(--radius-md);
+      gap: 6px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px 4px;
+      background: transparent;
+      border: none;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      color: var(--text-muted);
+    }
+
+    .tab-btn.active {
+      background: var(--card-bg);
+      color: var(--text-main);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    /* Tab Contents */
+    .tab-content {
+      display: none;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .tab-content.active {
+      display: flex;
+    }
+
+    /* Component: Card Design */
+    .card {
+      background: var(--accent-yellow);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      text-align: center;
+      position: relative;
+      box-shadow: inset 0 0 0 2px rgba(255, 235, 59, 0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .pos-badge {
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      display: inline-block;
+    }
+    .pos-n { background-color: #BBDEFB; color: #0D47A1; }
+    .pos-adj { background-color: #C8E6C9; color: #1B5E20; }
+    .pos-v { background-color: #FFCDD2; color: #B71C1C; }
+    .pos-adv { background-color: #E1BEE7; color: #4A148C; }
+    .pos-default { background-color: #CFD8DC; color: #263238; }
+
+    .word-title {
+      font-size: 2.8rem;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .btn-speaker {
+      background: #FFFFFF;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      font-size: 1.5rem;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      padding: 0;
+    }
+
+    .info-row {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.7);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      text-align: left;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .info-text {
+      font-size: 1.05rem;
+    }
+
+    .btn-audio-sm {
+      background: var(--primary-blue);
+      border-radius: 50%;
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      font-size: 0.9rem;
+      padding: 0;
+    }
+
+    .nav-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 8px;
+    }
+
+    /* Dictation Tab */
+    .dictation-card {
+      background: var(--accent-green);
+    }
+
+    .dictation-input {
+      font-size: 1.3rem;
+      text-align: center;
+      width: 100%;
+      padding: 12px;
+    }
+
+    .feedback-msg {
+      font-size: 1.1rem;
+      font-weight: bold;
+      min-height: 28px;
+    }
+    .feedback-success { color: #2E7D32; }
+    .feedback-error { color: #C62828; }
+
+    /* Puzzle Tab */
+    .puzzle-card {
+      background: var(--accent-pink);
+    }
+
+    .slots-area, .tiles-area {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      min-height: 50px;
+      width: 100%;
+      padding: 8px;
+    }
+
+    .slots-area {
+      border-bottom: 2px dashed var(--accent-pink-dark);
+      padding-bottom: 16px;
+    }
+
+    .letter-btn {
+      width: 44px;
+      height: 44px;
+      font-size: 1.2rem;
+      background: #FFFFFF;
+      border: 2px solid #FFCDD2;
+      border-radius: var(--radius-sm);
+      box-shadow: 0 4px 0 #EF9A9A;
+    }
+
+    .letter-btn:active {
+      transform: translateY(4px);
+      box-shadow: none;
+    }
+
+    .letter-btn.empty {
+      background: rgba(255,255,255,0.4);
+      border: 2px dashed #BDBDBD;
+      box-shadow: none;
+    }
+
+    /* Config Tab */
+    textarea {
+      width: 100%;
+      height: 200px;
+      font-family: monospace;
+      font-size: 0.9rem;
+      resize: vertical;
+    }
+
+    .btn-action {
+      background-color: var(--accent-green-dark);
+      color: #1B5E20;
+      padding: 12px;
+      font-size: 1rem;
+    }
+
+    /* Responsiveness */
+    @media (max-width: 480px) {
+      .app-container { padding: 16px; }
+      .word-title { font-size: 2.2rem; }
+      .tab-btn { font-size: 0.85rem; padding: 8px 2px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    <header>
+      <h1>🌸 小學館全美語 ESL</h1>
+      <div class="controls-bar">
+        <div class="control-group">
+          <label for="groupSelect">選擇包裹：</label>
+          <select id="groupSelect" onchange="onGroupChange()"></select>
+        </div>
+        <div class="control-group">
+          <label for="voiceSelect">語音發音：</label>
+          <select id="voiceSelect"></select>
+        </div>
+      </div>
+    </header>
+
+    <!-- Navigation Tabs -->
+    <nav class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('learn')">📖 學習</button>
+      <button class="tab-btn" onclick="switchTab('dictation')">🎧 聽寫</button>
+      <button class="tab-btn" onclick="switchTab('puzzle')">🧩 拼圖</button>
+      <button class="tab-btn" onclick="switchTab('config')">⚙️ 設定</button>
+    </nav>
+
+    <!-- Tab A: Learn -->
+    <section id="tab-learn" class="tab-content active">
+      <div class="card">
+        <span id="learn-pos" class="pos-badge pos-n">n.</span>
+        <div id="learn-word" class="word-title">word</div>
+        <button class="btn-speaker" onclick="speakCurrentWord()">🔊</button>
+        
+        <div class="info-row">
+          <span class="info-text"><b>中文：</b><span id="learn-chinese"></span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-text"><b>解釋：</b><span id="learn-defEn"></span></span>
+          <button class="btn-audio-sm" onclick="speakText(currentWordObj.defEn)">🔊</button>
+        </div>
+        <div class="info-row">
+          <span class="info-text"><b>例句：</b><span id="learn-example"></span></span>
+          <button class="btn-audio-sm" onclick="speakText(currentWordObj.example)">🔊</button>
+        </div>
+      </div>
+
+      <div class="nav-controls">
+        <button onclick="prevWord()">⬅️ 上一個</button>
+        <span id="learn-progress">1 / 1</span>
+        <button onclick="nextWord()">下一個 ➡️</button>
+      </div>
+    </section>
+
+    <!-- Tab B: Dictation -->
+    <section id="tab-dictation" class="tab-content">
+      <div class="card dictation-card">
+        <button class="btn-speaker" onclick="speakCurrentWord()">🔊 再聽一次</button>
+        <div class="info-row">
+          <span class="info-text"><b>提示：</b>[<span id="dict-pos"></span>] <span id="dict-chinese"></span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-text"><b>解釋：</b><span id="dict-defEn"></span></span>
+        </div>
+
+        <input type="text" id="dict-input" class="dictation-input" placeholder="請在此輸入英文單字..." autocomplete="off">
+        <div id="dict-feedback" class="feedback-msg"></div>
+
+        <div id="dict-example-box" class="info-row" style="display: none;">
+          <span class="info-text"><b>例句：</b><span id="dict-example"></span></span>
+          <button class="btn-audio-sm" onclick="speakText(currentWordObj.example)">🔊</button>
+        </div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button id="dict-check-btn" style="flex: 1;" onclick="checkDictation()">檢查答案</button>
+        <button id="dict-hint-btn" style="background: var(--accent-yellow-dark);" onclick="showDictationHint()">💡 第一個字母</button>
+      </div>
+
+      <div class="nav-controls">
+        <button onclick="prevWord()">⬅️ 上一個</button>
+        <span id="dict-progress">1 / 1</span>
+        <button onclick="nextWord()">下一個 ➡️</button>
+      </div>
+    </section>
+
+    <!-- Tab C: Puzzle -->
+    <section id="tab-puzzle" class="tab-content">
+      <div class="card puzzle-card">
+        <div class="info-row">
+          <span class="info-text"><b>中文：</b><span id="puz-chinese"></span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-text"><b>解釋：</b><span id="puz-defEn"></span></span>
+        </div>
+
+        <!-- Selected Letters Area -->
+        <div id="puz-slots" class="slots-area"></div>
+
+        <!-- Available Letter Tiles -->
+        <div id="puz-tiles" class="tiles-area"></div>
+
+        <div id="puz-feedback" class="feedback-msg"></div>
+      </div>
+
+      <div style="display: flex; gap: 10px;">
+        <button style="flex: 1; background: var(--accent-yellow-dark);" onclick="resetPuzzle()">🔄 清除重來</button>
+        <button style="flex: 1;" onclick="checkPuzzle()">檢查答案</button>
+      </div>
+
+      <div class="nav-controls">
+        <button onclick="prevWord()">⬅️ 上一個</button>
+        <span id="puz-progress">1 / 1</span>
+        <button onclick="nextWord()">下一個 ➡️</button>
+      </div>
+    </section>
+
+    <!-- Tab D: Configuration -->
+    <section id="tab-config" class="tab-content">
+      <div class="control-group">
+        <label for="jsonInput">JSON 單字庫數據編輯：</label>
+        <textarea id="jsonInput"></textarea>
+      </div>
+      <button class="btn-action" onclick="saveConfiguration()">💾 儲存並更新數據</button>
+    </section>
+
+  </div>
+
+  <script>
+    // 1. Default Word Data
+    const defaultData = [
+      {"word": "sea", "pos": "n.", "group": "包裹 1", "chinese": "大海", "defEn": "The big blue water.", "example": "Fish live in the sea."},
+      {"word": "cold", "pos": "adj.", "group": "包裹 1", "chinese": "冰涼的", "defEn": "Not hot; like ice.", "example": "The ice cream is very cold."},
+      {"word": "where", "pos": "adv.", "group": "包裹 2", "chinese": "在哪裡", "defEn": "What place.", "example": "Where is my teddy bear?"},
+      {"word": "biggest", "pos": "adj.", "group": "包裹 2", "chinese": "最大的", "defEn": "More big than all others.", "example": "The elephant is the biggest animal."}
+    ];
+
+    // State
+    let wordDatabase = [];
+    let currentGroupList = [];
+    let currentIndex = 0;
+    let currentWordObj = null;
+    let currentTab = 'learn';
+    let availableVoices = [];
+
+    // Puzzle State
+    let puzzleUserSelection = [];
+
+    // 2. Initialization
+    window.addEventListener('DOMContentLoaded', () => {
+      loadDatabase();
+      initSpeechAPI();
+      renderGroupOptions();
+      onGroupChange();
+      
+      // Auto-focus dictation input on Enter key
+      document.getElementById('dict-input').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') checkDictation();
+      });
+    });
+
+    // 3. Load / Save Database
+    function loadDatabase() {
+      const stored = localStorage.getItem('esl_word_db');
+      if (stored) {
+        try {
+          wordDatabase = JSON.parse(stored);
+        } catch (e) {
+          wordDatabase = defaultData;
+        }
+      } else {
+        wordDatabase = defaultData;
+      }
+      document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
+    }
+
+    function saveConfiguration() {
+      const rawText = document.getElementById('jsonInput').value;
+      try {
+        const parsed = JSON.parse(rawText);
+        if (!Array.isArray(parsed)) throw new Error("JSON 必須是陣列格式");
+        wordDatabase = parsed;
+        localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
+        alert('儲存成功！');
+        renderGroupOptions();
+        onGroupChange();
+      } catch (err) {
+        alert('JSON 格式錯誤：' + err.message);
+      }
+    }
+
+    // 4. Web Speech API (Voices)
+    function initSpeechAPI() {
+      if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = populateVoiceList;
+        populateVoiceList();
+      }
+    }
+
+    function populateVoiceList() {
+      if (!('speechSynthesis' in window)) return;
+      availableVoices = window.speechSynthesis.getVoices();
+      const select = document.getElementById('voiceSelect');
+      select.innerHTML = '';
+
+      let defaultIdx = 0;
+      availableVoices.forEach((voice, index) => {
+        const option = document.createElement('option');
+        option.textContent = `${voice.name} (${voice.lang})`;
+        option.value = index;
+        select.appendChild(option);
+
+        // Priority Voice Match
+        if (voice.name.includes("Google UK English Male") || 
+            voice.name.includes("Google en-US") || 
+            (voice.lang.startsWith("en") && defaultIdx === 0)) {
+          defaultIdx = index;
+        }
+      });
+
+      if (availableVoices.length > 0) {
+        select.selectedIndex = defaultIdx;
+      }
+    }
+
+    function speakText(text) {
+      if (!('speechSynthesis' in window) || !text) return;
+      window.speechSynthesis.cancel(); // Stop current speech
+      const utterance = new SpeechSynthesisUtterance(text);
+      const voiceIdx = document.getElementById('voiceSelect').value;
+      if (availableVoices[voiceIdx]) {
+        utterance.voice = availableVoices[voiceIdx];
+      }
+      utterance.rate = 0.9; // Slightly slower for kids
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function speakCurrentWord() {
+      if (currentWordObj) speakText(currentWordObj.word);
+    }
+
+    // 5. Data Filtering & Navigation
+    function renderGroupOptions() {
+      const groups = [...new Set(wordDatabase.map(item => item.group || "預設包裹"))];
+      const select = document.getElementById('groupSelect');
+      select.innerHTML = '';
+      groups.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        select.appendChild(opt);
+      });
+    }
+
+    function onGroupChange() {
+      const selectedGroup = document.getElementById('groupSelect').value;
+      currentGroupList = wordDatabase.filter(item => (item.group || "預設包裹") === selectedGroup);
+      currentIndex = 0;
+      updateUI();
+    }
+
+    function prevWord() {
+      if (currentGroupList.length === 0) return;
+      currentIndex = (currentIndex - 1 + currentGroupList.length) % currentGroupList.length;
+      updateUI();
+    }
+
+    function nextWord() {
+      if (currentGroupList.length === 0) return;
+      currentIndex = (currentIndex + 1) % currentGroupList.length;
+      updateUI();
+    }
+
+    // 6. UI Render Control
+    function updateUI() {
+      if (currentGroupList.length === 0) return;
+      currentWordObj = currentGroupList[currentIndex];
+
+      // Update Progress
+      const progressText = `${currentIndex + 1} / ${currentGroupList.length}`;
+      document.getElementById('learn-progress').textContent = progressText;
+      document.getElementById('dict-progress').textContent = progressText;
+      document.getElementById('puz-progress').textContent = progressText;
+
+      // Update POS Badge Color
+      updatePosBadge('learn-pos', currentWordObj.pos);
+      updatePosBadge('dict-pos', currentWordObj.pos);
+
+      // Render Tab A: Learn
+      document.getElementById('learn-word').textContent = currentWordObj.word;
+      document.getElementById('learn-chinese').textContent = currentWordObj.chinese;
+      document.getElementById('learn-defEn').textContent = currentWordObj.defEn;
+      document.getElementById('learn-example').textContent = currentWordObj.example;
+
+      // Render Tab B: Dictation
+      document.getElementById('dict-chinese').textContent = currentWordObj.chinese;
+      document.getElementById('dict-defEn').textContent = currentWordObj.defEn;
+      document.getElementById('dict-example').textContent = currentWordObj.example;
+      document.getElementById('dict-input').value = '';
+      document.getElementById('dict-feedback').textContent = '';
+      document.getElementById('dict-feedback').className = 'feedback-msg';
+      document.getElementById('dict-example-box').style.display = 'none';
+
+      // Render Tab C: Puzzle
+      document.getElementById('puz-chinese').textContent = currentWordObj.chinese;
+      document.getElementById('puz-defEn').textContent = currentWordObj.defEn;
+      document.getElementById('puz-feedback').textContent = '';
+      document.getElementById('puz-feedback').className = 'feedback-msg';
+      initPuzzle();
+
+      // Audio Trigger for Dictation Mode
+      if (currentTab === 'dictation') {
+        speakCurrentWord();
+      }
+    }
+
+    function updatePosBadge(elementId, posText) {
+      const badge = document.getElementById(elementId);
+      badge.textContent = posText || '';
+      badge.className = 'pos-badge ';
+      
+      const cleanPos = (posText || '').toLowerCase().replace('.', '');
+      if (['n', 'noun'].includes(cleanPos)) badge.classList.add('pos-n');
+      else if (['adj', 'adjective'].includes(cleanPos)) badge.classList.add('pos-adj');
+      else if (['v', 'verb'].includes(cleanPos)) badge.classList.add('pos-v');
+      else if (['adv', 'adverb'].includes(cleanPos)) badge.classList.add('pos-adv');
+      else badge.classList.add('pos-default');
+    }
+
+    // 7. Tabs Switching
+    function switchTab(tabName) {
+      currentTab = tabName;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+      event.currentTarget.classList.add('active');
+      document.getElementById(`tab-${tabName}`).classList.add('active');
+
+      if (tabName === 'dictation') {
+        speakCurrentWord();
+      }
+    }
+
+    // 8. Dictation Logic
+    function checkDictation() {
+      const input = document.getElementById('dict-input').value.trim().toLowerCase();
+      const target = currentWordObj.word.trim().toLowerCase();
+      const feedback = document.getElementById('dict-feedback');
+
+      if (input === target) {
+        feedback.textContent = '🎉 太棒了！答對了！';
+        feedback.className = 'feedback-msg feedback-success';
+        document.getElementById('dict-example-box').style.display = 'flex';
+        speakText('Great job! ' + currentWordObj.word);
+      } else {
+        feedback.textContent = '❌ 再試一次哦！';
+        feedback.className = 'feedback-msg feedback-error';
+      }
+    }
+
+    function showDictationHint() {
+      if (!currentWordObj) return;
+      const firstLetter = currentWordObj.word.charAt(0);
+      document.getElementById('dict-input').value = firstLetter;
+      document.getElementById('dict-input').focus();
+    }
+
+    // 9. Word Puzzle Logic
+    let shuffledLetters = [];
+
+    function initPuzzle() {
+      if (!currentWordObj) return;
+      puzzleUserSelection = [];
+      const word = currentWordObj.word.replace(/\s+/g, ''); // Clear spaces for puzzle
+      
+      // Shuffle Array
+      shuffledLetters = word.split('').map((char, id) => ({ char, id }));
+      for (let i = shuffledLetters.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledLetters[i], shuffledLetters[j]] = [shuffledLetters[j], shuffledLetters[i]];
+      }
+
+      renderPuzzleBoard();
+    }
+
+    function renderPuzzleBoard() {
+      const slotsContainer = document.getElementById('puz-slots');
+      const tilesContainer = document.getElementById('puz-tiles');
+      slotsContainer.innerHTML = '';
+      tilesContainer.innerHTML = '';
+
+      const targetLen = currentWordObj.word.replace(/\s+/g, '').length;
+
+      // Render Selected Slots
+      for (let i = 0; i < targetLen; i++) {
+        const btn = document.createElement('button');
+        btn.className = 'letter-btn';
+        if (puzzleUserSelection[i]) {
+          btn.textContent = puzzleUserSelection[i].char;
+          btn.onclick = () => unselectLetter(i);
+        } else {
+          btn.classList.add('empty');
+        }
+        slotsContainer.appendChild(btn);
+      }
+
+      // Render Available Letter Tiles
+      shuffledLetters.forEach((item) => {
+        const isSelected = puzzleUserSelection.some(selected => selected.id === item.id);
+        if (!isSelected) {
+          const btn = document.createElement('button');
+          btn.className = 'letter-btn';
+          btn.textContent = item.char;
+          btn.onclick = () => selectLetter(item);
+          tilesContainer.appendChild(btn);
+        }
+      });
+    }
+
+    function selectLetter(item) {
+      puzzleUserSelection.push(item);
+      renderPuzzleBoard();
+    }
+
+    function unselectLetter(index) {
+      puzzleUserSelection.splice(index, 1);
+      renderPuzzleBoard();
+    }
+
+    function resetPuzzle() {
+      puzzleUserSelection = [];
+      document.getElementById('puz-feedback').textContent = '';
+      document.getElementById('puz-feedback').className = 'feedback-msg';
+      renderPuzzleBoard();
+    }
+
+    function checkPuzzle() {
+      const userWord = puzzleUserSelection.map(item => item.char).join('').toLowerCase();
+      const targetWord = currentWordObj.word.replace(/\s+/g, '').toLowerCase();
+      const feedback = document.getElementById('puz-feedback');
+
+      if (userWord === targetWord) {
+        feedback.textContent = '🌟 拼對了！你真棒！';
+        feedback.className = 'feedback-msg feedback-success';
+        speakCurrentWord();
+      } else {
+        feedback.textContent = '💪 還差一點點，再試試看！';
+        feedback.className = 'feedback-msg feedback-error';
+      }
+    }
+  </script>
+</body>
+</html>
+
 ```
-
-### 5. 輸出限制
-請直接輸出完整、單一檔案、排版美觀且包含繁體中文介面的 HTML 原始碼。不要做任何解釋，直接給出程式碼框。
