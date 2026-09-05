@@ -46,7 +46,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        select, button, textarea {
+        select, button {
             font-size: 16px;
             padding: 8px 12px;
             border-radius: 5px;
@@ -84,87 +84,104 @@
         .tab-content {
             display: none;
             width: 100%;
-            max-width: 800px;
+            max-width: 600px;
         }
 
         .tab-content.active {
             display: block;
         }
 
-        .grid-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-            gap: 20px;
-        }
-
-        .card {
+        /* 單張翻頁卡片樣式 */
+        .single-card {
             background-color: var(--card-bg);
-            border-radius: 10px;
-            padding: 15px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.08);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            transition: transform 0.2s;
+            gap: 20px;
+            text-align: left;
+            position: relative;
         }
 
-        .card:hover {
-            transform: translateY(-5px);
+        .card-header-flex {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 15px;
         }
 
         .word-title {
-            font-size: 20px;
+            font-size: 32px;
             font-weight: bold;
             color: #2c3e50;
+        }
+
+        .pos {
+            font-size: 16px;
+            color: #7f8c8d;
+            font-style: italic;
+        }
+
+        .chinese-block {
+            font-size: 24px;
+            color: #e67e22;
+            font-weight: bold;
+        }
+
+        .section-box {
+            background: #f9f9f9;
+            padding: 12px 15px;
+            border-radius: 8px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .pos {
-            font-size: 14px;
-            color: #7f8c8d;
-            font-style: italic;
+        .section-label {
+            font-size: 12px;
+            color: #888;
+            margin-bottom: 4px;
+            text-transform: uppercase;
         }
 
-        .chinese {
-            font-size: 18px;
-            color: #e67e22;
-            margin: 8px 0;
-        }
-
-        .def-en {
-            font-size: 14px;
-            color: #555;
-            margin-bottom: 8px;
-        }
-
-        .example {
-            font-size: 13px;
-            color: #777;
-            background: #f9f9f9;
-            padding: 6px;
-            border-left: 3px solid var(--primary-color);
-            border-radius: 0 4px 4px 0;
+        .section-content {
+            font-size: 16px;
+            color: #444;
         }
 
         .audio-btn {
             background: none;
             color: var(--primary-color);
             border: none;
-            font-size: 18px;
-            padding: 0 5px;
+            font-size: 22px;
+            cursor: pointer;
+            padding: 5px;
         }
 
         .audio-btn:hover {
-            background: none;
             color: var(--secondary-color);
         }
 
+        .card-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 20px;
+        }
+
+        .page-indicator {
+            font-size: 16px;
+            color: #666;
+            font-weight: bold;
+        }
+
+        /* 測驗樣式 */
         .quiz-card {
             background: white;
             padding: 30px;
-            border-radius: 10px;
+            border-radius: 12px;
             box-shadow: 0 4px 10px rgba(0,0,0,0.1);
             text-align: center;
         }
@@ -187,20 +204,6 @@
         .quiz-opt-btn:hover {
             background-color: #e2e6ea;
         }
-
-        .setting-box {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-
-        textarea {
-            width: 100%;
-            height: 300px;
-            box-sizing: border-box;
-            font-family: monospace;
-        }
     </style>
 </head>
 <body>
@@ -211,8 +214,8 @@
 
     <div class="controls">
         <div>
-            <label for="groupSelect">選擇包裹：</label>
-            <select id="groupSelect" onchange="filterData()"></select>
+            <label for="groupSelect">選擇年級：</label>
+            <select id="groupSelect" onchange="changeGroup()"></select>
         </div>
         <div>
             <label for="voiceSelect">語音發音：</label>
@@ -223,12 +226,16 @@
     <div class="nav-tabs">
         <button class="nav-btn active" onclick="switchTab('learn')">📖 學習</button>
         <button class="nav-btn" onclick="switchTab('quiz')">🧩 測驗</button>
-        <!-- ⚙️ 設定頁面已隱藏 -->
     </div>
 
-    <!-- 學習分頁 -->
+    <!-- 學習分頁 (單字一頁) -->
     <div id="learnTab" class="tab-content active">
-        <div id="cardGrid" class="grid-container"></div>
+        <div id="singleCardContainer" class="single-card"></div>
+        <div class="card-navigation">
+            <button onclick="prevCard()">⬅️ 上一個</button>
+            <span id="pageIndicator" class="page-indicator">1 / 1</span>
+            <button onclick="nextCard()">下一個 ➡️</button>
+        </div>
     </div>
 
     <!-- 測驗分頁 -->
@@ -241,40 +248,28 @@
         </div>
     </div>
 
-    <!-- 設定分頁 (隱藏) -->
-    <div id="settingsTab" class="tab-content">
-        <div class="setting-box">
-            <h3>JSON 單字庫數據編輯：</h3>
-            <textarea id="jsonInput"></textarea>
-            <br><br>
-            <button onclick="saveDatabase()">💾 儲存並更新數據</button>
-        </div>
-    </div>
-
 <script>
-// 內建完整 ESL 1A ~ 6A 單字資料
 const defaultData = [
   { "word": "new", "pos": "adj.", "group": "ESL 1A", "chinese": "新的", "defEn": "not old; made or bought a short time ago", "example": "I have a new bag." },
   { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的 / 老的", "defEn": "not new; having been here for a long time", "example": "This is my old bike." },
   { "word": "play basketball", "pos": "v. phr.", "group": "ESL 1A", "chinese": "打籃球", "defEn": "to play a game with a ball and a basket", "example": "I play basketball with my friends." },
-  { "word": "play football", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢美式足球", "defEn": "to play a game with a ball and two teams", "example": "We play football at school." },
-  { "word": "play soccer", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢足球", "defEn": "to play a game where you kick a ball", "example": "They play soccer in the park." },
-  { "word": "teacher", "pos": "n.", "group": "ESL 1A", "chinese": "老師", "defEn": "a person who teaches children at school", "example": "My teacher is very nice." },
   { "word": "whose", "pos": "pron.", "group": "ESL 2A", "chinese": "誰的", "defEn": "used to ask who something belongs to", "example": "Whose bag is this?" },
   { "word": "hotel", "pos": "n.", "group": "ESL 2A", "chinese": "飯店旅館", "defEn": "a place where people can stay when they are away from home", "example": "We stay at a hotel." },
   { "word": "Spanish", "pos": "adj.", "group": "ESL 3A", "chinese": "西班牙文 / 西班牙人的", "defEn": "from Spain, or the language spoken in Spain", "example": "My new classmate is Spanish." },
   { "word": "important", "pos": "adj.", "group": "ESL 3A", "chinese": "重要的", "defEn": "you need to think about or do carefully", "example": "It is important to check your bag." },
   { "word": "land", "pos": "n.", "group": "ESL 4A", "chinese": "陸地 / 降落", "defEn": "the ground, not the sea; to come down to the ground", "example": "The plane landed safely." },
   { "word": "Europe", "pos": "n.", "group": "ESL 4A", "chinese": "歐洲", "defEn": "a continent that includes countries such as France and Spain", "example": "We want to travel to Europe." },
-  { "word": "dinosaur", "pos": "n.", "group": "ESL 5A", "chinese": "恐龍", "defEn": "a large reptile that lived millions of years ago", "example": "We saw a dinosaur skeleton at the museum." },
-  { "word": "textbook", "pos": "n.", "group": "ESL 6A", "chinese": "課本", "defEn": "a book used for studying a school subject", "example": "Our science textbook has many pictures." }
+  { "word": "handsome", "pos": "adj.", "group": "ESL 5A", "chinese": "英俊的", "defEn": "good-looking, especially used to describe a man or boy", "example": "The handsome actor smiled at the children." },
+  { "word": "already", "pos": "adv.", "group": "ESL 5A", "chinese": "已經", "defEn": "before now, or sooner than expected", "example": "I have already finished my science project." },
+  { "word": "fashion", "pos": "n.", "group": "ESL 6A", "chinese": "時尚", "defEn": "a popular style of clothes, hair, or appearance", "example": "Fashion changes over time." },
+  { "word": "button", "pos": "n.", "group": "ESL 6A", "chinese": "鈕扣 / 按鈕", "defEn": "a small round object on clothes used to fasten them", "example": "Press the green button on the machine." }
 ];
 
 let wordDatabase = [];
-let currentQuizIndex = 0;
+let filteredData = [];
+let currentIndex = 0;
 let currentQuizAnswer = '';
 
-// 初始化語音選單
 function populateVoiceList() {
     if (typeof speechSynthesis === 'undefined') return;
     const voices = speechSynthesis.getVoices();
@@ -298,6 +293,7 @@ if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !=
 
 function speak(text) {
     if (typeof speechSynthesis === 'undefined') return;
+    speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     const voiceSelect = document.getElementById('voiceSelect');
     const selectedOption = voiceSelect.selectedOptions[0];
@@ -308,28 +304,11 @@ function speak(text) {
     speechSynthesis.speak(utterance);
 }
 
-// 載入資料庫（直接強制使用 defaultData）
 function loadDatabase() {
     wordDatabase = defaultData;
     localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
-    if (document.getElementById('jsonInput')) {
-        document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
-    }
 }
 
-function saveDatabase() {
-    try {
-        const input = document.getElementById('jsonInput').value;
-        wordDatabase = JSON.parse(input);
-        localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
-        alert('儲存成功！');
-        initApp();
-    } catch (e) {
-        alert('JSON 格式錯誤，請檢查！');
-    }
-}
-
-// 分頁切換
 function switchTab(tabName) {
     document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -341,16 +320,13 @@ function switchTab(tabName) {
         document.querySelectorAll('.nav-btn')[1].classList.add('active');
         document.getElementById('quizTab').classList.add('active');
         initQuiz();
-    } else if (tabName === 'settings') {
-        document.getElementById('settingsTab').classList.add('active');
     }
 }
 
-// 下拉選單填充
 function populateGroupFilter() {
     const select = document.getElementById('groupSelect');
     const groups = [...new Set(wordDatabase.map(item => item.group))].sort();
-    select.innerHTML = '<option value="ALL">全部顯示</option>';
+    select.innerHTML = '<option value="ALL">全部年級</option>';
     groups.forEach(group => {
         const opt = document.createElement('option');
         opt.value = group;
@@ -359,37 +335,77 @@ function populateGroupFilter() {
     });
 }
 
-function filterData() {
-    renderCards();
+function changeGroup() {
+    currentIndex = 0;
+    updateFilteredData();
+    renderSingleCard();
 }
 
-// 渲染學習卡片
-function renderCards() {
-    const grid = document.getElementById('cardGrid');
+function updateFilteredData() {
     const selectedGroup = document.getElementById('groupSelect').value;
-    grid.innerHTML = '';
-
-    const filtered = selectedGroup === 'ALL' 
+    filteredData = selectedGroup === 'ALL' 
         ? wordDatabase 
         : wordDatabase.filter(item => item.group === selectedGroup);
+}
 
-    filtered.forEach(item => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
+// 渲染單字一頁
+function renderSingleCard() {
+    const container = document.getElementById('singleCardContainer');
+    const indicator = document.getElementById('pageIndicator');
+    
+    if (filteredData.length === 0) {
+        container.innerHTML = '<div style="text-align:center; padding:20px;">此年級目前沒有單字資料</div>';
+        indicator.textContent = '0 / 0';
+        return;
+    }
+
+    if (currentIndex >= filteredData.length) currentIndex = 0;
+    if (currentIndex < 0) currentIndex = filteredData.length - 1;
+
+    const item = filteredData[currentIndex];
+    indicator.textContent = `${currentIndex + 1} / ${filteredData.length}`;
+
+    container.innerHTML = `
+        <div class="card-header-flex">
             <div>
-                <div class="word-title">
-                    <span>${item.word}</span>
-                    <button class="audio-btn" onclick="speak('${item.word.replace(/'/g, "\\'")}')">🔊</button>
-                </div>
-                <div class="pos">${item.pos || ''}</div>
-                <div class="chinese">${item.chinese}</div>
-                <div class="def-en">${item.defEn || ''}</div>
+                <div class="word-title">${item.word}</div>
+                <div class="pos">${item.pos || ''} &bull; <span style="color:var(--primary-color);">${item.group}</span></div>
             </div>
-            <div class="example">${item.example || ''}</div>
-        `;
-        grid.appendChild(card);
-    });
+            <button class="audio-btn" onclick="speak('${item.word.replace(/'/g, "\\'")}')" title="讀出單字">🔊 發音</button>
+        </div>
+
+        <div class="chinese-block">
+            ${item.chinese}
+        </div>
+
+        <div>
+            <div class="section-label">英文解釋 (Definition)</div>
+            <div class="section-box">
+                <div class="section-content">${item.defEn || ''}</div>
+                <button class="audio-btn" onclick="speak('${(item.defEn || '').replace(/'/g, "\\'")}')" title="讀出解釋">🔊</button>
+            </div>
+        </div>
+
+        <div>
+            <div class="section-label">例句 (Example)</div>
+            <div class="section-box" style="border-left: 4px solid var(--primary-color);">
+                <div class="section-content" style="font-style: italic;">${item.example || ''}</div>
+                <button class="audio-btn" onclick="speak('${(item.example || '').replace(/'/g, "\\'")}')" title="讀出例句">🔊</button>
+            </div>
+        </div>
+    `;
+}
+
+function nextCard() {
+    if (filteredData.length === 0) return;
+    currentIndex = (currentIndex + 1) % filteredData.length;
+    renderSingleCard();
+}
+
+function prevCard() {
+    if (filteredData.length === 0) return;
+    currentIndex = (currentIndex - 1 + filteredData.length) % filteredData.length;
+    renderSingleCard();
 }
 
 // 測驗功能
@@ -399,13 +415,10 @@ function initQuiz() {
 
 function nextQuiz() {
     document.getElementById('quizFeedback').textContent = '';
-    const selectedGroup = document.getElementById('groupSelect').value;
-    const pool = selectedGroup === 'ALL' 
-        ? wordDatabase 
-        : wordDatabase.filter(item => item.group === selectedGroup);
+    const pool = filteredData.length > 0 ? filteredData : wordDatabase;
 
     if (pool.length === 0) {
-        document.getElementById('quizQuestion').textContent = '該群組尚無資料';
+        document.getElementById('quizQuestion').textContent = '尚無測驗資料';
         document.getElementById('quizOptions').innerHTML = '';
         return;
     }
@@ -414,10 +427,9 @@ function nextQuiz() {
     currentQuizAnswer = current.chinese;
     document.getElementById('quizQuestion').textContent = current.word;
 
-    // 隨機選項
     let options = [current.chinese];
-    while (options.length < 4 && options.length < pool.length) {
-        const randomItem = pool[Math.floor(Math.random() * pool.length)];
+    while (options.length < 4 && options.length < wordDatabase.length) {
+        const randomItem = wordDatabase[Math.floor(Math.random() * wordDatabase.length)];
         if (!options.includes(randomItem.chinese)) {
             options.push(randomItem.chinese);
         }
@@ -446,11 +458,11 @@ function checkQuiz(selected) {
     }
 }
 
-// 主初始化程序
 function initApp() {
     loadDatabase();
     populateGroupFilter();
-    renderCards();
+    updateFilteredData();
+    renderSingleCard();
 }
 
 window.onload = initApp;
