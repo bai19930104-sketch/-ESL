@@ -445,11 +445,117 @@
   <script>
     // 1. Default Word Data
     const defaultData = [
-      {"word": "sea", "pos": "n.", "group": "包裹 1", "chinese": "大海", "defEn": "The big blue water.", "example": "Fish live in the sea."},
-      {"word": "cold", "pos": "adj.", "group": "包裹 1", "chinese": "冰涼的", "defEn": "Not hot; like ice.", "example": "The ice cream is very cold."},
-      {"word": "where", "pos": "adv.", "group": "包裹 2", "chinese": "在哪裡", "defEn": "What place.", "example": "Where is my teddy bear?"},
-      {"word": "biggest", "pos": "adj.", "group": "包裹 2", "chinese": "最大的", "defEn": "More big than all others.", "example": "The elephant is the biggest animal."}
-    ];
+      [
+  { "word": "new", "pos": "adj.", "group": "ESL 1A", "chinese": "新的", "defEn": "not old; made or bought a short time ago", "example": "I have a new bag." },
+  { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的 / 老的", "defEn": "not new; having been here for a long time", "example": "This is my old bike." },
+  { "word": "play basketball", "pos": "v. phr.", "group": "ESL 1A", "chinese": "打籃球", "defEn": "to play a game with a ball and a basket", "example": "I play basketball with my friends." },
+  { "word": "play football", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢美式足球", "defEn": "to play a game with a ball and two teams", "example": "We play football at school." },
+  { "word": "play soccer", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢足球", "defEn": "to play a game where you kick a ball", "example": "They play soccer in the park." },
+  { "word": "teacher", "pos": "n.", "group": "ESL 1A", "chinese": "老師", "defEn": "a person who teaches children at school", "example": "My teacher is very nice." },
+  { "word": "see", "pos": "v.", "group": "ESL 1A", "chinese": "看見", "defEn": "to use your eyes to look at something", "example": "I can see a bird in the tree." },
+  { "word": "again", "pos": "adv.", "group": "ESL 1A", "chinese": "再一次", "defEn": "one more time", "example": "Please say it again." },
+  { "word": "count", "pos": "v.", "group": "ESL 1A", "chinese": "數數", "defEn": "to say numbers in order", "example": "I can count from one to ten." },
+  { "word": "really great", "pos": "phr.", "group": "ESL 1A", "chinese": "真的很棒", "defEn": "very good", "example": "The new game is really great." },
+  { "word": "in the forest", "pos": "phr.", "group": "ESL 1A", "chinese": "在森林裡", "defEn": "in a place with many trees", "example": "There are many animals in the forest." },
+  { "word": "afraid of", "pos": "adj. phr.", "group": "ESL 1A", "chinese": "對...感到害怕的", "defEn": "feeling scared of someone or something", "example": "I am afraid of big dogs." },
+  { "word": "student", "pos": "n.", "group": "ESL 1A", "chinese": "學生", "defEn": "a person who learns at school", "example": "She is a student at my school." },
+  { "word": "go home", "pos": "v. phr.", "group": "ESL 1A", "chinese": "回家", "defEn": "to go to the place where you live", "example": "I go home after school." },
+  { "word": "spell", "pos": "v.", "group": "ESL 1A", "chinese": "拼(字)", "defEn": "to say or write the letters in a word", "example": "Can you spell your name?" },
+
+  { "word": "whose", "pos": "pron.", "group": "ESL 2A", "chinese": "誰的", "defEn": "used to ask who something belongs to", "example": "Whose bag is this?" },
+  { "word": "hotel", "pos": "n.", "group": "ESL 2A", "chinese": "飯店旅館", "defEn": "a place where people can stay when they are away from home", "example": "We stay at a hotel." },
+  { "word": "know", "pos": "v.", "group": "ESL 2A", "chinese": "知道 / 認識", "defEn": "to have information about someone or something", "example": "I know her name." },
+  { "word": "skate", "pos": "v.", "group": "ESL 2A", "chinese": "溜冰", "defEn": "to move on ice wearing skates", "example": "I can skate on the ice." },
+  { "word": "fight about", "pos": "v. phr.", "group": "ESL 2A", "chinese": "爭執", "defEn": "to argue about something", "example": "The children fight about the toy." },
+  { "word": "an artist", "pos": "n.", "group": "ESL 2A", "chinese": "藝術家", "defEn": "a person who makes pictures or art", "example": "My aunt is an artist." },
+  { "word": "tidy up", "pos": "v. phr.", "group": "ESL 2A", "chinese": "收拾整理", "defEn": "to make a place clean and neat", "example": "Please tidy up your room." },
+  { "word": "son", "pos": "n.", "group": "ESL 2A", "chinese": "兒子", "defEn": "a boy or man who is someone's child", "example": "He is their son." },
+  { "word": "best friend", "pos": "n. phr.", "group": "ESL 2A", "chinese": "最好的朋友", "defEn": "the friend you like the most", "example": "Ben is my best friend." },
+  { "word": "thin", "pos": "adj.", "group": "ESL 2A", "chinese": "瘦的 / 薄的", "defEn": "not fat; not thick", "example": "The boy is thin." },
+  { "word": "become", "pos": "v.", "group": "ESL 2A", "chinese": "變成 / 成為", "defEn": "to start to be something", "example": "He wants to become a teacher." },
+  { "word": "sled", "pos": "n.", "group": "ESL 2A", "chinese": "雪橇", "defEn": "a thing you sit on to move over snow", "example": "The children ride on a sled in the snow." },
+  { "word": "a lot of trouble", "pos": "phr.", "group": "ESL 2A", "chinese": "許多的問題", "defEn": "many problems", "example": "The boy has a lot of trouble at school." },
+  { "word": "bring", "pos": "v.", "group": "ESL 2A", "chinese": "帶來", "defEn": "to take someone or something with you to a place", "example": "Please bring your book to school." },
+  { "word": "poor", "pos": "adj.", "group": "ESL 2A", "chinese": "貧窮的 / 可憐的", "defEn": "having very little money; making you feel sorry for someone", "example": "The poor family has very little money." },
+  { "word": "need", "pos": "v.", "group": "ESL 2A", "chinese": "需要", "defEn": "to have to have or do something", "example": "I need a pencil." },
+  { "word": "ask", "pos": "v.", "group": "ESL 2A", "chinese": "問", "defEn": "to say something because you want to know something", "example": "I ask my teacher a question." },
+
+  { "word": "Spanish", "pos": "adj.", "group": "ESL 3A", "chinese": "西班牙文 / 西班牙人的", "defEn": "from Spain, or the language spoken in Spain", "example": "My new classmate is Spanish, and she can speak both Spanish and English." },
+  { "word": "important", "pos": "adj.", "group": "ESL 3A", "chinese": "重要的", "defEn": "you need to think about or do carefully", "example": "It is important to check your school bag before you leave home in the morning." },
+  { "word": "before", "pos": "prep.", "group": "ESL 3A", "chinese": "...之前", "defEn": "earlier than a particular time or event", "example": "We need to arrive at school before eight o'clock." },
+  { "word": "plastic", "pos": "n.", "group": "ESL 3A", "chinese": "塑膠(的)", "defEn": "a light material used to make many things", "example": "This toy is made of plastic." },
+  { "word": "instead", "pos": "adv.", "group": "ESL 3A", "chinese": "作為替代", "defEn": "in place of someone or something else", "example": "It was raining outside, so we stayed home and played a board game instead." },
+  { "word": "brilliant", "pos": "adj.", "group": "ESL 3A", "chinese": "聰明的 / 棒的", "defEn": "very clever, very good, or exciting", "example": "Mia had a brilliant idea for our class project, and everyone wanted to try it." },
+  { "word": "competition", "pos": "n.", "group": "ESL 3A", "chinese": "競賽", "defEn": "an event in which people try to win", "example": "Our school is having a drawing competition, and the winner will get a small prize." },
+  { "word": "huge", "pos": "adj.", "group": "ESL 3A", "chinese": "龐大的", "defEn": "very big", "example": "We saw a huge ship at the harbor when we visited the city last weekend." },
+  { "word": "slide", "pos": "n.", "group": "ESL 3A", "chinese": "溜滑梯", "defEn": "a piece of playground equipment that you go down for fun", "example": "The children climbed up the steps and took turns going down the slide." },
+  { "word": "diving board", "pos": "n.", "group": "ESL 3A", "chinese": "跳水板", "defEn": "a board above a swimming pool that people jump from", "example": "The boy stood on the diving board for a moment before jumping into the pool." },
+  { "word": "pancake", "pos": "n.", "group": "ESL 3A", "chinese": "鬆餅", "defEn": "a thin, round food made from flour, eggs, and milk", "example": "Dad made warm pancakes for breakfast, and we ate them with fruit and honey." },
+  { "word": "strawberry", "pos": "n.", "group": "ESL 3A", "chinese": "草莓", "defEn": "a small, soft, red fruit with tiny seeds on the outside", "example": "We bought some strawberries at the market and added them to our fruit salad." },
+  { "word": "usually", "pos": "adv.", "group": "ESL 3A", "chinese": "通常", "defEn": "on most days or in most situations", "example": "I usually finish my homework before dinner, but today I have football practice." },
+  { "word": "text", "pos": "v.", "group": "ESL 3A", "chinese": "傳訊息給...", "defEn": "to send someone a short written message by phone", "example": "I will text you when I get home from school." },
+  { "word": "parking lot", "pos": "n.", "group": "ESL 3A", "chinese": "停車場", "defEn": "a place where people can leave their cars", "example": "We left our car in the parking lot near the supermarket and walked to the shops." },
+  { "word": "guess", "pos": "v.", "group": "ESL 3A", "chinese": "猜", "defEn": "to give an answer when you are not sure if it is correct", "example": "I did not know the answer, so I tried to guess it from the picture." },
+  { "word": "sound", "pos": "v.", "group": "ESL 3A", "chinese": "聽起來", "defEn": "to seem from what you hear", "example": "That music sounds beautiful to me." },
+
+  { "word": "land", "pos": "n.", "group": "ESL 4A", "chinese": "陸地 / 降落", "defEn": "the ground, not the sea; to come down to the ground", "example": "The plane landed safely at the airport just before the storm began." },
+  { "word": "Europe", "pos": "n.", "group": "ESL 4A", "chinese": "歐洲", "defEn": "a continent that includes countries such as France, Spain, and Italy", "example": "My family would like to travel around Europe and visit several countries one day." },
+  { "word": "river", "pos": "n.", "group": "ESL 4A", "chinese": "河流", "defEn": "a long, natural area of water that flows across the land", "example": "We walked beside the river and watched small boats moving across the water." },
+  { "word": "healthy", "pos": "adj.", "group": "ESL 4A", "chinese": "健康的", "defEn": "good for your body and helping you stay well", "example": "Eating fruit and vegetables and getting enough sleep can help you stay healthy." },
+  { "word": "moth", "pos": "n.", "group": "ESL 4A", "chinese": "蛾", "defEn": "an insect like a butterfly that usually flies at night", "example": "A small moth flew near the light when we opened the window at night." },
+  { "word": "mammal", "pos": "n.", "group": "ESL 4A", "chinese": "哺乳類動物", "defEn": "an animal whose babies drink milk from their mother", "example": "Dolphins are mammals even though they live and swim in the sea." },
+  { "word": "centimeter", "pos": "n.", "group": "ESL 4A", "chinese": "公分", "defEn": "a unit used for measuring length; one hundred centimeters make a meter", "example": "The little plant grew three centimeters taller during the school holiday." },
+  { "word": "solar system", "pos": "n.", "group": "ESL 4A", "chinese": "太陽系", "defEn": "the Sun and the planets and other objects that move around it", "example": "Earth is one of the planets in our solar system that moves around the Sun." },
+  { "word": "magazine", "pos": "n.", "group": "ESL 4A", "chinese": "雜誌", "defEn": "a thin book with pictures and stories that you can read", "example": "I found an interesting animal magazine in the library and read it after class." },
+  { "word": "keep away", "pos": "phr. v.", "group": "ESL 4A", "chinese": "使...遠離(不靠近)", "defEn": "to stay away from someone or something, or make someone stay away", "example": "Please keep away from the wet floor until it is clean and dry." },
+  { "word": "curl up", "pos": "phr. v.", "group": "ESL 4A", "chinese": "捲曲 / 捲起", "defEn": "to sit or lie with your body in a round shape", "example": "The little dog curled up beside the girl and went to sleep." },
+  { "word": "only", "pos": "adv.", "group": "ESL 4A", "chinese": "只有 / 唯一的", "defEn": "and no more than this; being the one person or thing of its kind", "example": "I only have one apple left, so I will save it for my lunch." },
+  { "word": "liquid", "pos": "n.", "group": "ESL 4A", "chinese": "液體 / 液態的", "defEn": "something that can flow and is not a solid or a gas", "example": "Water is a liquid, so it takes the shape of the bottle or cup it is in." },
+  { "word": "alien", "pos": "n.", "group": "ESL 4A", "chinese": "外星人", "defEn": "a creature from another planet, especially in a story or film", "example": "The children watched a funny film about an alien who came to Earth." },
+  { "word": "happen", "pos": "v.", "group": "ESL 4A", "chinese": "發生", "defEn": "to take place or become true, especially without being planned", "example": "Nobody knew what would happen next, so everyone waited quietly." },
+  { "word": "armadillo", "pos": "n.", "group": "ESL 4A", "chinese": "犰狳", "defEn": "a small animal with a hard covering that protects its body", "example": "Armadillos have a hard covering on their bodies that helps protect them." },
+  { "word": "porcupine", "pos": "n.", "group": "ESL 4A", "chinese": "豪豬", "defEn": "an animal with many long, sharp spikes on its body", "example": "A porcupine uses the sharp spikes on its body to help protect itself." },
+
+  { "word": "handsome", "pos": "adj.", "group": "ESL 5A", "chinese": "英俊的", "defEn": "good-looking, especially used to describe a man or boy", "example": "The handsome actor smiled at the children and signed their books after the show." },
+  { "word": "already", "pos": "adv.", "group": "ESL 5A", "chinese": "已經", "defEn": "before now, or sooner than expected", "example": "I have already finished my science project, so I can help you with yours this evening." },
+  { "word": "voice", "pos": "n.", "group": "ESL 5A", "chinese": "人的聲音", "defEn": "the sound that a person makes when speaking or singing", "example": "I recognized Emma immediately because her voice sounded exactly the same on the phone." },
+  { "word": "tofu dish", "pos": "n.", "group": "ESL 5A", "chinese": "豆腐菜餚", "defEn": "a dish that has tofu as one of its main ingredients", "example": "We ordered a tofu dish with vegetables because my sister wanted to try something different for dinner." },
+  { "word": "post", "pos": "v.", "group": "ESL 5A", "chinese": "郵寄 / 發文", "defEn": "to send a letter or package by mail; or put information on the Internet", "example": "Before you post a photo online, make sure it does not show any private information." },
+  { "word": "soft", "pos": "adj.", "group": "ESL 5A", "chinese": "柔軟的 / 輕柔的", "defEn": "not hard, rough, or firm; gentle and not loud or strong", "example": "The blanket is so soft and warm that the baby quickly fell asleep under it." },
+  { "word": "beef", "pos": "n.", "group": "ESL 5A", "chinese": "牛肉", "defEn": "meat that comes from a cow", "example": "Dad cooked beef with onions and vegetables for dinner, and everyone asked for a second helping." },
+  { "word": "unique", "pos": "adj.", "group": "ESL 5A", "chinese": "獨特的", "defEn": "different from everyone or everything else of the same type", "example": "Each snowflake has a unique shape, which means it is different from all the others." },
+  { "word": "honest", "pos": "adj.", "group": "ESL 5A", "chinese": "誠實的", "defEn": "telling the truth and not trying to deceive people", "example": "Please be honest with me and tell me what really happened to the broken classroom window." },
+  { "word": "leather", "pos": "n.", "group": "ESL 5A", "chinese": "皮革", "defEn": "material made from animal skin and used for making things such as shoes, bags, and belts", "example": "My uncle has an old leather bag that he has used for work for more than ten years." },
+  { "word": "thunder", "pos": "n.", "group": "ESL 5A", "chinese": "打雷", "defEn": "the loud sound that you hear in the sky during a storm", "example": "We heard a loud clap of thunder just before the heavy rain began to fall." },
+  { "word": "tradition", "pos": "n.", "group": "ESL 5A", "chinese": "傳統", "defEn": "a custom or way of doing something that has continued for a long time", "example": "It is a family tradition to make dumplings together on the evening before the New Year." },
+  { "word": "staff", "pos": "n.", "group": "ESL 5A", "chinese": "全體員工", "defEn": "all the people who work for a company, school, shop, or other organization", "example": "The hotel staff were friendly and helped us find our room as soon as we arrived." },
+  { "word": "attend", "pos": "v.", "group": "ESL 5A", "chinese": "參加", "defEn": "to go to an event, school, meeting, or class", "example": "More than two hundred students attended the school festival and enjoyed the games and performances." },
+
+  { "word": "fashion", "pos": "n.", "group": "ESL 6A", "chinese": "時尚", "defEn": "a popular style of clothes, hair, or appearance", "example": "Fashion changes over time, so clothes that are popular today may look very different in the future." },
+  { "word": "button", "pos": "n.", "group": "ESL 6A", "chinese": "鈕扣 / 按鈕", "defEn": "a small round object on clothes used to fasten them; or a button on a machine", "example": "Press the green button on the machine when you are ready to start it." },
+  { "word": "benefit", "pos": "n.", "group": "ESL 6A", "chinese": "益處 / 利益", "defEn": "a good or helpful result that you get from something", "example": "One benefit of walking to school is that you can get some exercise every morning." },
+  { "word": "passage", "pos": "n.", "group": "ESL 6A", "chinese": "文章", "defEn": "a piece of writing in a book, test, or other text", "example": "Read the passage carefully before you answer the questions at the bottom of the page." },
+  { "word": "predator", "pos": "n.", "group": "ESL 6A", "chinese": "掠食者 / 天敵", "defEn": "an animal that hunts and eats other animals", "example": "A lion is a powerful predator that hunts other animals for food in the wild." },
+  { "word": "therefore", "pos": "adv.", "group": "ESL 6A", "chinese": "因此 / 所以", "defEn": "for that reason; because of what was just said", "example": "The road was closed because of heavy rain; therefore, we had to take a different way home." },
+  { "word": "improve", "pos": "v.", "group": "ESL 6A", "chinese": "改善 / 進步", "defEn": "to make something better or become better", "example": "Reading English books every day can improve your vocabulary and help you learn new words." },
+  { "word": "professional", "pos": "adj.", "group": "ESL 6A", "chinese": "專業的", "defEn": "connected with a job that needs special training or skill", "example": "The photos were taken by a professional photographer who has worked in this field for many years." },
+  { "word": "memory", "pos": "n.", "group": "ESL 6A", "chinese": "記憶 / 記憶體", "defEn": "the ability to remember things; or part of a computer device", "example": "My phone does not have enough memory, so I need to delete some old photos and videos." },
+  { "word": "include", "pos": "v.", "group": "ESL 6A", "chinese": "包括", "defEn": "to have someone or something as part of a group or thing", "example": "The price of the school trip includes lunch, a bus ticket, and a visit to the museum." },
+  { "word": "promote", "pos": "v.", "group": "ESL 6A", "chinese": "促進 / 推廣 / 升遷", "defEn": "to help something develop, advertise something, or give someone a higher job", "example": "Regular exercise can promote good health and help people feel stronger and more active." },
+  { "word": "brain", "pos": "n.", "group": "ESL 6A", "chinese": "腦袋 / 腦部", "defEn": "the part inside your head that helps you think, learn, and control your body", "example": "She hit her head during the game, so the doctor checked to make sure her brain was not injured." },
+  { "word": "function", "pos": "v.", "group": "ESL 6A", "chinese": "運作 / 功能", "defEn": "to work or operate in the correct way; or the purpose of something", "example": "The machine cannot function properly if one of its important parts is broken." },
+  { "word": "spinach", "pos": "n.", "group": "ESL 6A", "chinese": "菠菜", "defEn": "a green vegetable with soft leaves", "example": "My mother often puts spinach in our soup because it is a healthy green vegetable." },
+  { "word": "bones and muscles", "pos": "n. phr.", "group": "ESL 6A", "chinese": "骨頭和肌肉", "defEn": "the hard parts inside your body and the parts that help your body move", "example": "Exercise can help keep your bones and muscles strong, especially when you are growing." },
+  { "word": "strengthen", "pos": "v.", "group": "ESL 6A", "chinese": "強化 / 加強", "defEn": "to make someone or something stronger", "example": "Regular exercise can strengthen your muscles and help your body stay healthy and active." },
+  { "word": "squid", "pos": "n.", "group": "ESL 6A", "chinese": "魷魚", "defEn": "a sea animal with a long soft body and several arms", "example": "A squid lives in the sea and can move quickly through the water when it is in danger." },
+  { "word": "surface", "pos": "n.", "group": "ESL 6A", "chinese": "表面", "defEn": "the outside or top part of something", "example": "The surface of the table was wet, so I cleaned it with a dry cloth before putting my books down." },
+  { "word": "giant", "pos": "adj.", "group": "ESL 6A", "chinese": "巨大 / 龐大的", "defEn": "very large", "example": "We saw a giant tree in the forest that was much taller than all the other trees." },
+  { "word": "South America", "pos": "n.", "group": "ESL 6A", "chinese": "南美洲", "defEn": "a continent that is south of North America", "example": "Brazil is a large country in South America, and many people there speak Portuguese." },
+  { "word": "access", "pos": "v.", "group": "ESL 6A", "chinese": "存取 / 登入進入", "defEn": "the ability or right to enter a place or use something", "example": "You need a password to access your school account and read the information online." },
+  { "word": "orchestra", "pos": "n.", "group": "ESL 6A", "chinese": "管弦樂團", "defEn": "a large group of musicians who play different instruments together", "example": "The school orchestra played several beautiful songs while parents and students listened quietly." },
+  { "word": "text message", "pos": "n.", "group": "ESL 6A", "chinese": "簡訊 / 訊息", "defEn": "a short written message sent from one phone or device to another", "example": "I sent my mother a text message to tell her that I would arrive home a little later than usual." },
+  { "word": "textbook", "pos": "n.", "group": "ESL 6A", "chinese": "課本", "defEn": "a book used for studying a school subject", "example": "Our science textbook has many pictures and activities that help us understand each lesson more easily." }
+]
 
     // State
     let wordDatabase = [];
@@ -476,19 +582,12 @@
     });
 
     // 3. Load / Save Database
-    function loadDatabase() {
-      const stored = localStorage.getItem('esl_word_db');
-      if (stored) {
-        try {
-          wordDatabase = JSON.parse(stored);
-        } catch (e) {
-          wordDatabase = defaultData;
-        }
-      } else {
-        wordDatabase = defaultData;
-      }
-      document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
-    }
+   function loadDatabase() {
+    // 每次開啟都直接載入全新的 defaultData，並更新儲存庫
+    wordDatabase = defaultData;
+    localStorage.setItem('esl_word_db', JSON.stringify(wordDatabase));
+    document.getElementById('jsonInput').value = JSON.stringify(wordDatabase, null, 2);
+}
 
     function saveConfiguration() {
       const rawText = document.getElementById('jsonInput').value;
