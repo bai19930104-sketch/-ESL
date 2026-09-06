@@ -11,6 +11,8 @@
             --bg-color: #f4f7f6;
             --card-bg: #ffffff;
             --text-color: #333333;
+            --success-color: #2ecc71;
+            --danger-color: #e74c3c;
         }
 
         body {
@@ -46,7 +48,7 @@
             box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        select, button {
+        select, button, input {
             font-size: 16px;
             padding: 8px 12px;
             border-radius: 5px;
@@ -67,8 +69,10 @@
 
         .nav-tabs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
         }
 
         .nav-btn {
@@ -91,7 +95,7 @@
             display: block;
         }
 
-        /* 單張翻頁卡片樣式 */
+        /* 學習卡片樣式 */
         .single-card {
             background-color: var(--card-bg);
             border-radius: 12px;
@@ -101,7 +105,6 @@
             flex-direction: column;
             gap: 20px;
             text-align: left;
-            position: relative;
         }
 
         .card-header-flex {
@@ -155,7 +158,7 @@
             background: none;
             color: var(--primary-color);
             border: none;
-            font-size: 22px;
+            font-size: 20px;
             cursor: pointer;
             padding: 5px;
         }
@@ -177,7 +180,7 @@
             font-weight: bold;
         }
 
-        /* 測驗樣式 */
+        /* 通用測驗與練習面板 */
         .quiz-card {
             background: white;
             padding: 30px;
@@ -204,6 +207,18 @@
         .quiz-opt-btn:hover {
             background-color: #e2e6ea;
         }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .input-group input {
+            flex: 1;
+            max-width: 300px;
+        }
     </style>
 </head>
 <body>
@@ -225,10 +240,12 @@
 
     <div class="nav-tabs">
         <button class="nav-btn active" onclick="switchTab('learn')">📖 學習</button>
-        <button class="nav-btn" onclick="switchTab('quiz')">🧩 測驗</button>
+        <button class="nav-btn" onclick="switchTab('quiz')">🧩 選擇題測驗</button>
+        <button class="nav-btn" onclick="switchTab('dictation')">🎧 聽寫測驗</button>
+        <button class="nav-btn" onclick="switchTab('spelling')">✍️ 拼字練習</button>
     </div>
 
-    <!-- 學習分頁 (單字一頁) -->
+    <!-- 學習分頁 -->
     <div id="learnTab" class="tab-content active">
         <div id="singleCardContainer" class="single-card"></div>
         <div class="card-navigation">
@@ -238,13 +255,43 @@
         </div>
     </div>
 
-    <!-- 測驗分頁 -->
+    <!-- 選擇題測驗分頁 -->
     <div id="quizTab" class="tab-content">
         <div class="quiz-card">
             <h2 id="quizQuestion">---</h2>
             <div id="quizOptions" class="quiz-options"></div>
             <p id="quizFeedback" style="margin-top: 15px; font-weight: bold;"></p>
-            <button onclick="nextQuiz()" style="margin-top: 15px;">下一題</button>
+            <button onclick="initQuiz()" style="margin-top: 15px;">下一題</button>
+        </div>
+    </div>
+
+    <!-- 聽寫測驗分頁 -->
+    <div id="dictationTab" class="tab-content">
+        <div class="quiz-card">
+            <h2>聽發音寫出單字</h2>
+            <button onclick="playDictationAudio()" style="font-size: 24px; padding: 15px 25px; margin: 15px 0;">🔊 點擊播放發音</button>
+            <p id="dictationHint" style="color: #666; font-style: italic;"></p>
+            <div class="input-group">
+                <input type="text" id="dictationInput" placeholder="請輸入聽到的英文單字..." onkeydown="if(event.key==='Enter') checkDictation()">
+                <button onclick="checkDictation()">提交答案</button>
+            </div>
+            <p id="dictationFeedback" style="margin-top: 15px; font-weight: bold;"></p>
+            <button onclick="initDictation()" style="margin-top: 15px; background-color: #7f8c8d;">下一題</button>
+        </div>
+    </div>
+
+    <!-- 拼字練習分頁 -->
+    <div id="spellingTab" class="tab-content">
+        <div class="quiz-card">
+            <h2>看中文提示拼出單字</h2>
+            <div id="spellingChinese" style="font-size: 26px; color: #e67e22; font-weight: bold; margin: 15px 0;">---</div>
+            <p id="spellingPos" style="color: #7f8c8d; font-style: italic;"></p>
+            <div class="input-group">
+                <input type="text" id="spellingInput" placeholder="請輸入英文單字..." onkeydown="if(event.key==='Enter') checkSpelling()">
+                <button onclick="checkSpelling()">提交拼字</button>
+            </div>
+            <p id="spellingFeedback" style="margin-top: 15px; font-weight: bold;"></p>
+            <button onclick="initSpelling()" style="margin-top: 15px; background-color: #7f8c8d;">下一題</button>
         </div>
     </div>
 
@@ -269,6 +316,8 @@ let wordDatabase = [];
 let filteredData = [];
 let currentIndex = 0;
 let currentQuizAnswer = '';
+let currentDictationItem = null;
+let currentSpellingItem = null;
 
 function populateVoiceList() {
     if (typeof speechSynthesis === 'undefined') return;
@@ -320,6 +369,14 @@ function switchTab(tabName) {
         document.querySelectorAll('.nav-btn')[1].classList.add('active');
         document.getElementById('quizTab').classList.add('active');
         initQuiz();
+    } else if (tabName === 'dictation') {
+        document.querySelectorAll('.nav-btn')[2].classList.add('active');
+        document.getElementById('dictationTab').classList.add('active');
+        initDictation();
+    } else if (tabName === 'spelling') {
+        document.querySelectorAll('.nav-btn')[3].classList.add('active');
+        document.getElementById('spellingTab').classList.add('active');
+        initSpelling();
     }
 }
 
@@ -348,7 +405,7 @@ function updateFilteredData() {
         : wordDatabase.filter(item => item.group === selectedGroup);
 }
 
-// 渲染單字一頁
+// 學習翻頁
 function renderSingleCard() {
     const container = document.getElementById('singleCardContainer');
     const indicator = document.getElementById('pageIndicator');
@@ -373,11 +430,7 @@ function renderSingleCard() {
             </div>
             <button class="audio-btn" onclick="speak('${item.word.replace(/'/g, "\\'")}')" title="讀出單字">🔊 發音</button>
         </div>
-
-        <div class="chinese-block">
-            ${item.chinese}
-        </div>
-
+        <div class="chinese-block">${item.chinese}</div>
         <div>
             <div class="section-label">英文解釋 (Definition)</div>
             <div class="section-box">
@@ -385,7 +438,6 @@ function renderSingleCard() {
                 <button class="audio-btn" onclick="speak('${(item.defEn || '').replace(/'/g, "\\'")}')" title="讀出解釋">🔊</button>
             </div>
         </div>
-
         <div>
             <div class="section-label">例句 (Example)</div>
             <div class="section-box" style="border-left: 4px solid var(--primary-color);">
@@ -408,20 +460,11 @@ function prevCard() {
     renderSingleCard();
 }
 
-// 測驗功能
+// 選擇題
 function initQuiz() {
-    nextQuiz();
-}
-
-function nextQuiz() {
     document.getElementById('quizFeedback').textContent = '';
     const pool = filteredData.length > 0 ? filteredData : wordDatabase;
-
-    if (pool.length === 0) {
-        document.getElementById('quizQuestion').textContent = '尚無測驗資料';
-        document.getElementById('quizOptions').innerHTML = '';
-        return;
-    }
+    if (pool.length === 0) return;
 
     const current = pool[Math.floor(Math.random() * pool.length)];
     currentQuizAnswer = current.chinese;
@@ -430,9 +473,7 @@ function nextQuiz() {
     let options = [current.chinese];
     while (options.length < 4 && options.length < wordDatabase.length) {
         const randomItem = wordDatabase[Math.floor(Math.random() * wordDatabase.length)];
-        if (!options.includes(randomItem.chinese)) {
-            options.push(randomItem.chinese);
-        }
+        if (!options.includes(randomItem.chinese)) options.push(randomItem.chinese);
     }
     options.sort(() => Math.random() - 0.5);
 
@@ -442,19 +483,78 @@ function nextQuiz() {
         const btn = document.createElement('button');
         btn.className = 'quiz-opt-btn';
         btn.textContent = opt;
-        btn.onclick = () => checkQuiz(opt);
+        btn.onclick = () => {
+            const feedback = document.getElementById('quizFeedback');
+            if (opt === currentQuizAnswer) {
+                feedback.textContent = '🎉 正確！非常棒！';
+                feedback.style.color = 'var(--success-color)';
+            } else {
+                feedback.textContent = `❌ 答錯囉！正確答案是：${currentQuizAnswer}`;
+                feedback.style.color = 'var(--danger-color)';
+            }
+        };
         optionsContainer.appendChild(btn);
     });
 }
 
-function checkQuiz(selected) {
-    const feedback = document.getElementById('quizFeedback');
-    if (selected === currentQuizAnswer) {
-        feedback.textContent = '🎉 正確！非常棒！';
-        feedback.style.color = 'green';
+// 聽寫測驗
+function initDictation() {
+    document.getElementById('dictationFeedback').textContent = '';
+    document.getElementById('dictationInput').value = '';
+    const pool = filteredData.length > 0 ? filteredData : wordDatabase;
+    if (pool.length === 0) return;
+
+    currentDictationItem = pool[Math.floor(Math.random() * pool.length)];
+    document.getElementById('dictationHint').textContent = `提示：中文意思是「${currentDictationItem.chinese}」(${currentDictationItem.pos || ''})`;
+    playDictationAudio();
+}
+
+function playDictationAudio() {
+    if (currentDictationItem) {
+        speak(currentDictationItem.word);
+    }
+}
+
+function checkDictation() {
+    if (!currentDictationItem) return;
+    const userVal = document.getElementById('dictationInput').value.trim().toLowerCase();
+    const correctVal = currentDictationItem.word.toLowerCase();
+    const feedback = document.getElementById('dictationFeedback');
+
+    if (userVal === correctVal) {
+        feedback.textContent = '🎉 拼寫正確！太棒了！';
+        feedback.style.color = 'var(--success-color)';
     } else {
-        feedback.textContent = `❌ 答錯囉！正確答案是：${currentQuizAnswer}`;
-        feedback.style.color = 'red';
+        feedback.textContent = `❌ 拼寫錯誤！正確單字是：${currentDictationItem.word}`;
+        feedback.style.color = 'var(--danger-color)';
+    }
+}
+
+// 拼字練習
+function initSpelling() {
+    document.getElementById('spellingFeedback').textContent = '';
+    document.getElementById('spellingInput').value = '';
+    const pool = filteredData.length > 0 ? filteredData : wordDatabase;
+    if (pool.length === 0) return;
+
+    currentSpellingItem = pool[Math.floor(Math.random() * pool.length)];
+    document.getElementById('spellingChinese').textContent = currentSpellingItem.chinese;
+    document.getElementById('spellingPos').textContent = `詞性：${currentSpellingItem.pos || '未分類'} | 英文解釋：${currentSpellingItem.defEn || ''}`;
+}
+
+function checkSpelling() {
+    if (!currentSpellingItem) return;
+    const userVal = document.getElementById('spellingInput').value.trim().toLowerCase();
+    const correctVal = currentSpellingItem.word.toLowerCase();
+    const feedback = document.getElementById('spellingFeedback');
+
+    if (userVal === correctVal) {
+        feedback.textContent = '🎉 拼字完全正確！';
+        feedback.style.color = 'var(--success-color)';
+        speak(currentSpellingItem.word);
+    } else {
+        feedback.textContent = `❌ 答錯囉！正確拼字是：${currentSpellingItem.word}`;
+        feedback.style.color = 'var(--danger-color)';
     }
 }
 
