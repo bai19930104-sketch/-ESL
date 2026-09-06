@@ -455,6 +455,11 @@ function populateVoiceList() {
     if (availableVoices.length === 0) {
         availableVoices = allVoices.filter(voice => voice.lang.toLowerCase().includes('en'));
     }
+    
+    // 如果過濾後還是空的，就把所有的語音都抓進來，確保手機不會沒聲音
+    if (availableVoices.length === 0) {
+        availableVoices = allVoices;
+    }
 
     voiceSelect.innerHTML = '';
     availableVoices.forEach((voice, index) => {
@@ -462,10 +467,10 @@ function populateVoiceList() {
         option.value = index;
         
         let displayName = voice.name.toUpperCase();
-        if (displayName.includes('US')) {
-            option.textContent = 'GOOGLE US';
+        if (displayName.includes('US') || displayName.includes('EN')) {
+            option.textContent = voice.name;
         } else {
-            option.textContent = 'GOOGLE EN';
+            option.textContent = voice.name;
         }
         
         voiceSelect.appendChild(option);
@@ -473,25 +478,33 @@ function populateVoiceList() {
 }
 
 populateVoiceList();
-if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
-    speechSynthesis.onvoiceschanged = populateVoiceList;
+if (typeof speechSynthesis !== 'undefined') {
+    if (speechSynthesis.onvoiceschanged !== undefined) {
+        speechSynthesis.onvoiceschanged = populateVoiceList;
+    }
 }
 
 function speak(text) {
     if (typeof speechSynthesis === 'undefined') return;
+    
+    // 手機瀏覽器防呆：先取消上一個正在跑的語音
     speechSynthesis.cancel();
+
     const utterance = new SpeechSynthesisUtterance(text);
     const voiceSelect = document.getElementById('voiceSelect');
     const selectedIndex = voiceSelect.value;
     
-    if (availableVoices[selectedIndex]) {
+    if (availableVoices.length > 0 && availableVoices[selectedIndex]) {
         utterance.voice = availableVoices[selectedIndex];
     }
 
     utterance.rate = 0.85;
     utterance.pitch = 1.0;
 
-    speechSynthesis.speak(utterance);
+    // 手機版有時候需要這行來強制喚醒某些瀏覽器的語音通道
+    setTimeout(() => {
+        speechSynthesis.speak(utterance);
+    }, 50);
 }
 
 function loadDatabase() {
@@ -646,7 +659,6 @@ function initQuiz() {
 function initSentenceQuiz() {
     document.getElementById('sentenceFeedback').textContent = '';
     const pool = filteredData.length > 0 ? filteredData : wordDatabase;
-    // 過濾出有例句的項目
     const validPool = pool.filter(item => item.example && item.example.includes(item.word));
     const finalPool = validPool.length > 0 ? validPool : pool;
     if (finalPool.length === 0) return;
@@ -654,9 +666,7 @@ function initSentenceQuiz() {
     currentSentenceItem = finalPool[Math.floor(Math.random() * finalPool.length)];
     currentSentenceAnswer = currentSentenceItem.word;
 
-    // 將例句中的單字替換成底線挖空
     let maskedExample = currentSentenceItem.example;
-    // 使用正則忽略大小寫替換
     const regex = new RegExp(currentSentenceItem.word, 'gi');
     maskedExample = maskedExample.replace(regex, '______');
 
@@ -757,6 +767,15 @@ function initApp() {
     populateGroupFilter();
     updateFilteredData();
     renderSingleCard();
+    
+    // 行動裝置觸控解鎖語音機制 (針對部分手機首次點擊無聲音問題)
+    document.body.addEventListener('touchstart', function() {
+        if (typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking === false) {
+            const silentUtter = new SpeechSynthesisUtterance('');
+            silentUtter.volume = 0;
+            speechSynthesis.speak(silentUtter);
+        }
+    }, { once: true });
 }
 
 window.onload = initApp;
