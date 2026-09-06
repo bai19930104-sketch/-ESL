@@ -437,30 +437,49 @@ let currentDictationItem = null;
 let currentSpellingItem = null;
 let availableVoices = [];
 
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 function populateVoiceList() {
     if (typeof speechSynthesis === 'undefined') return;
     const synth = speechSynthesis;
     const allVoices = synth.getVoices();
     const voiceSelect = document.getElementById('voiceSelect');
     
-    // 嚴格篩選：只抓取英文(en)且偏向 US/EN 的語音，並優先挑選常見的女聲關鍵字（如 google, samantha, karen, victoria, moira 等，或避開 male/david/mark 等明顯男聲）
-    let filtered = allVoices.filter(voice => {
-        const name = voice.name.toLowerCase();
-        const lang = voice.lang.toLowerCase();
-        const isEnglish = lang.includes('en');
-        const isUsOrEn = lang.includes('en-us') || lang.includes('en-gb') || name.includes('us') || name.includes('en') || name.includes('united states') || name.includes('united kingdom');
-        const isNotMale = !name.includes('male') && !name.includes('david') && !name.includes('mark') && !name.includes('george') && !name.includes('james');
-        return isEnglish && isUsOrEn && isNotMale;
-    });
+    let filtered = [];
+    const mobile = isMobileDevice();
 
-    // 如果篩選後數量不足，退回僅限制英文與非明顯男聲
-    if (filtered.length === 0) {
-        filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en') && !voice.name.toLowerCase().includes('male'));
-    }
-    
-    // 若還是空的就抓全部英文
-    if (filtered.length === 0) {
-        filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en'));
+    if (mobile) {
+        // 手機版：嚴格只保留 Samantha 發音（通常常見於 iOS 裝置）
+        filtered = allVoices.filter(voice => {
+            const name = voice.name.toLowerCase();
+            return name.includes('samantha');
+        });
+
+        // 若手機沒有 Samantha，退回尋找任何英文女聲或一般英文語音避免空陣列
+        if (filtered.length === 0) {
+            filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en') && !voice.name.toLowerCase().includes('male'));
+        }
+    } else {
+        // 電腦網頁版：恢復 Google 的英文發音（例如 Google US English 或帶有 google 的英文語音）
+        filtered = allVoices.filter(voice => {
+            const name = voice.name.toLowerCase();
+            const lang = voice.lang.toLowerCase();
+            const isEnglish = lang.includes('en');
+            const isGoogle = name.includes('google');
+            const isNotMale = !name.includes('male') && !name.includes('david') && !name.includes('mark');
+            return isEnglish && isGoogle && isNotMale;
+        });
+
+        // 如果找不到 Google 語音，退回一般美式/英文語音
+        if (filtered.length === 0) {
+            filtered = allVoices.filter(voice => {
+                const name = voice.name.toLowerCase();
+                const lang = voice.lang.toLowerCase();
+                return lang.includes('en') && !name.includes('male');
+            });
+        }
     }
 
     availableVoices = filtered;
@@ -469,9 +488,14 @@ function populateVoiceList() {
     availableVoices.forEach((voice, index) => {
         const option = document.createElement('option');
         option.value = index;
-        option.textContent = voice.name;
+        option.textContent = `${voice.name} (${voice.lang})`;
         voiceSelect.appendChild(option);
     });
+
+    // 自動預設選中第一個符合條件的語音
+    if (voiceSelect.options.length > 0) {
+        voiceSelect.selectedIndex = 0;
+    }
 }
 
 populateVoiceList();
