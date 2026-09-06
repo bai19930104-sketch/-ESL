@@ -518,7 +518,8 @@ function speak(text) {
         utterance.voice = availableVoices[selectedIndex];
     }
 
-    utterance.rate = 0.85;
+    // 語速已調慢（原為 0.85，現改為 0.7 讓發音更清晰）
+    utterance.rate = 0.7;
     utterance.pitch = 1.0;
 
     setTimeout(() => {
