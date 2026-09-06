@@ -443,36 +443,33 @@ function populateVoiceList() {
     const allVoices = synth.getVoices();
     const voiceSelect = document.getElementById('voiceSelect');
     
-    availableVoices = allVoices.filter(voice => {
+    // 嚴格篩選：只抓取英文(en)且偏向 US/EN 的語音，並優先挑選常見的女聲關鍵字（如 google, samantha, karen, victoria, moira 等，或避開 male/david/mark 等明顯男聲）
+    let filtered = allVoices.filter(voice => {
         const name = voice.name.toLowerCase();
         const lang = voice.lang.toLowerCase();
         const isEnglish = lang.includes('en');
-        const isGoogle = name.includes('google');
-        const isUsOrEn = name.includes('us') || name.includes('en') || name.includes('united kingdom') || name.includes('united states');
-        return isEnglish && isGoogle && isUsOrEn;
+        const isUsOrEn = lang.includes('en-us') || lang.includes('en-gb') || name.includes('us') || name.includes('en') || name.includes('united states') || name.includes('united kingdom');
+        const isNotMale = !name.includes('male') && !name.includes('david') && !name.includes('mark') && !name.includes('george') && !name.includes('james');
+        return isEnglish && isUsOrEn && isNotMale;
     });
 
-    if (availableVoices.length === 0) {
-        availableVoices = allVoices.filter(voice => voice.lang.toLowerCase().includes('en'));
+    // 如果篩選後數量不足，退回僅限制英文與非明顯男聲
+    if (filtered.length === 0) {
+        filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en') && !voice.name.toLowerCase().includes('male'));
     }
     
-    // 如果過濾後還是空的，就把所有的語音都抓進來，確保手機不會沒聲音
-    if (availableVoices.length === 0) {
-        availableVoices = allVoices;
+    // 若還是空的就抓全部英文
+    if (filtered.length === 0) {
+        filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en'));
     }
+
+    availableVoices = filtered;
 
     voiceSelect.innerHTML = '';
     availableVoices.forEach((voice, index) => {
         const option = document.createElement('option');
         option.value = index;
-        
-        let displayName = voice.name.toUpperCase();
-        if (displayName.includes('US') || displayName.includes('EN')) {
-            option.textContent = voice.name;
-        } else {
-            option.textContent = voice.name;
-        }
-        
+        option.textContent = voice.name;
         voiceSelect.appendChild(option);
     });
 }
@@ -487,7 +484,6 @@ if (typeof speechSynthesis !== 'undefined') {
 function speak(text) {
     if (typeof speechSynthesis === 'undefined') return;
     
-    // 手機瀏覽器防呆：先取消上一個正在跑的語音
     speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
@@ -501,7 +497,6 @@ function speak(text) {
     utterance.rate = 0.85;
     utterance.pitch = 1.0;
 
-    // 手機版有時候需要這行來強制喚醒某些瀏覽器的語音通道
     setTimeout(() => {
         speechSynthesis.speak(utterance);
     }, 50);
@@ -768,7 +763,6 @@ function initApp() {
     updateFilteredData();
     renderSingleCard();
     
-    // 行動裝置觸控解鎖語音機制 (針對部分手機首次點擊無聲音問題)
     document.body.addEventListener('touchstart', function() {
         if (typeof speechSynthesis !== 'undefined' && speechSynthesis.speaking === false) {
             const silentUtter = new SpeechSynthesisUtterance('');
