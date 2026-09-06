@@ -420,19 +420,41 @@ let currentIndex = 0;
 let currentQuizAnswer = '';
 let currentDictationItem = null;
 let currentSpellingItem = null;
+let availableVoices = [];
 
 function populateVoiceList() {
     if (typeof speechSynthesis === 'undefined') return;
-    const voices = speechSynthesis.getVoices();
+    const synth = speechSynthesis;
+    const allVoices = synth.getVoices();
     const voiceSelect = document.getElementById('voiceSelect');
-    voiceSelect.innerHTML = '';
     
-    voices.forEach((voice) => {
+    // 嚴格篩選：只保留 Google 英文女生語音，對應 US 與 EN (UK/EN)
+    availableVoices = allVoices.filter(voice => {
+        const name = voice.name.toLowerCase();
+        const lang = voice.lang.toLowerCase();
+        const isEnglish = lang.includes('en');
+        const isGoogle = name.includes('google');
+        const isUsOrEn = name.includes('us') || name.includes('en') || name.includes('united kingdom') || name.includes('united states');
+        return isEnglish && isGoogle && isUsOrEn;
+    });
+
+    // 若系統抓不到特定 Google 語音，退回到備用選項
+    if (availableVoices.length === 0) {
+        availableVoices = allVoices.filter(voice => voice.lang.toLowerCase().includes('en'));
+    }
+
+    voiceSelect.innerHTML = '';
+    availableVoices.forEach((voice, index) => {
         const option = document.createElement('option');
-        option.textContent = `${voice.name} (${voice.lang})`;
-        option.setAttribute('data-lang', voice.lang);
-        option.setAttribute('data-name', voice.name);
-        if (voice.lang.includes('en')) option.selected = true;
+        option.value = index;
+        
+        let displayName = voice.name.toUpperCase();
+        if (displayName.includes('US')) {
+            option.textContent = 'GOOGLE US';
+        } else {
+            option.textContent = 'GOOGLE EN';
+        }
+        
         voiceSelect.appendChild(option);
     });
 }
@@ -447,11 +469,16 @@ function speak(text) {
     speechSynthesis.cancel();
     const utterance = new SpeechSynthesisUtterance(text);
     const voiceSelect = document.getElementById('voiceSelect');
-    const selectedOption = voiceSelect.selectedOptions[0];
-    if (selectedOption) {
-        const voices = speechSynthesis.getVoices();
-        utterance.voice = voices.find(v => v.name === selectedOption.getAttribute('data-name'));
+    const selectedIndex = voiceSelect.value;
+    
+    if (availableVoices[selectedIndex]) {
+        utterance.voice = availableVoices[selectedIndex];
     }
+
+    // 語速再調慢一點點 (rate 設為 0.85)
+    utterance.rate = 0.85;
+    utterance.pitch = 1.0;
+
     speechSynthesis.speak(utterance);
 }
 
