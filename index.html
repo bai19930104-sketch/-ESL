@@ -281,11 +281,12 @@
     <!-- 聽寫測驗分頁 -->
     <div id="dictationTab" class="tab-content">
         <div class="quiz-card">
-            <h2>聽發音寫出單字</h2>
+            <h2>聽發音填寫單字挖空</h2>
             <button onclick="playDictationAudio()" style="font-size: 24px; padding: 15px 25px; margin: 15px 0;">🔊 點擊播放發音</button>
+            <div id="dictationMaskedWord" style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #2c3e50; margin: 15px 0;">---</div>
             <p id="dictationHint" style="color: #666; font-style: italic;"></p>
             <div class="input-group">
-                <input type="text" id="dictationInput" placeholder="請輸入聽到的英文單字..." onkeydown="if(event.key==='Enter') checkDictation()">
+                <input type="text" id="dictationInput" placeholder="請輸入完整英文單字..." onkeydown="if(event.key==='Enter') checkDictation()">
                 <button onclick="checkDictation()">提交答案</button>
             </div>
             <p id="dictationFeedback" style="margin-top: 15px; font-weight: bold;"></p>
@@ -296,11 +297,12 @@
     <!-- 拼字練習分頁 -->
     <div id="spellingTab" class="tab-content">
         <div class="quiz-card">
-            <h2>看中文提示拼出單字</h2>
+            <h2>看中文提示拼出挖空單字</h2>
             <div id="spellingChinese" style="font-size: 26px; color: #e67e22; font-weight: bold; margin: 15px 0;">---</div>
+            <div id="spellingMaskedWord" style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #2c3e50; margin: 15px 0;">---</div>
             <p id="spellingPos" style="color: #7f8c8d; font-style: italic;"></p>
             <div class="input-group">
-                <input type="text" id="spellingInput" placeholder="請輸入英文單字..." onkeydown="if(event.key==='Enter') checkSpelling()">
+                <input type="text" id="spellingInput" placeholder="請輸入完整英文單字..." onkeydown="if(event.key==='Enter') checkSpelling()">
                 <button onclick="checkSpelling()">提交拼字</button>
             </div>
             <p id="spellingFeedback" style="margin-top: 15px; font-weight: bold;"></p>
@@ -312,7 +314,7 @@
 const defaultData = [
   // ESL 1A
   { "word": "new", "pos": "adj.", "group": "ESL 1A", "chinese": "新的", "defEn": "not old; made or bought a short time ago", "example": "I have a new bag." },
-  { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的/老的", "defEn": "not new; having been here for a long time", "example": "This is my old bike." },
+  { "word": "old", "pos": "adj.", "group": "ESL 1A", "chinese": "舊的/老的", "defEn": "not old; having been here for a long time", "example": "This is my old bike." },
   { "word": "play basketball", "pos": "v. phr.", "group": "ESL 1A", "chinese": "打籃球", "defEn": "to play a game with a ball and a basket", "example": "I play basketball with my friends." },
   { "word": "play football", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢美式足球", "defEn": "to play a game with a ball and two teams", "example": "We play football at school." },
   { "word": "play soccer", "pos": "v. phr.", "group": "ESL 1A", "chinese": "踢足球", "defEn": "to play a game where you kick a ball", "example": "They play soccer in the park." },
@@ -502,7 +504,6 @@ if (typeof speechSynthesis !== 'undefined') {
 
 function speak(text) {
     if (typeof speechSynthesis === 'undefined') return;
-    
     speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
@@ -712,6 +713,18 @@ function initSentenceQuiz() {
     });
 }
 
+// 產生挖空文字輔助函數 (隨機抽出一半左右的字母改為底線)
+function createMaskedWord(word) {
+    return word.split('').map(char => {
+        if (char === ' ') return ' &nbsp; ';
+        // 保留符號，英文字母隨機挖空約 50%
+        if (/[a-zA-Z]/.test(char)) {
+            return Math.random() < 0.5 ? '_' : char;
+        }
+        return char;
+    }).join(' ');
+}
+
 function initDictation() {
     document.getElementById('dictationFeedback').textContent = '';
     document.getElementById('dictationInput').value = '';
@@ -719,6 +732,7 @@ function initDictation() {
     if (pool.length === 0) return;
 
     currentDictationItem = pool[Math.floor(Math.random() * pool.length)];
+    document.getElementById('dictationMaskedWord').innerHTML = createMaskedWord(currentDictationItem.word);
     document.getElementById('dictationHint').textContent = `提示：中文意思是「${currentDictationItem.chinese}」(${currentDictationItem.pos || ''})`;
     playDictationAudio();
 }
@@ -752,6 +766,7 @@ function initSpelling() {
 
     currentSpellingItem = pool[Math.floor(Math.random() * pool.length)];
     document.getElementById('spellingChinese').textContent = currentSpellingItem.chinese;
+    document.getElementById('spellingMaskedWord').innerHTML = createMaskedWord(currentSpellingItem.word);
     document.getElementById('spellingPos').textContent = `詞性：${currentSpellingItem.pos || '未分類'} | 英文解釋：${currentSpellingItem.defEn || ''}`;
 }
 
