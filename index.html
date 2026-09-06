@@ -451,18 +451,15 @@ function populateVoiceList() {
     const mobile = isMobileDevice();
 
     if (mobile) {
-        // 手機版：嚴格只保留 Samantha 發音（通常常見於 iOS 裝置）
         filtered = allVoices.filter(voice => {
             const name = voice.name.toLowerCase();
             return name.includes('samantha');
         });
 
-        // 若手機沒有 Samantha，退回尋找任何英文女聲或一般英文語音避免空陣列
         if (filtered.length === 0) {
             filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en') && !voice.name.toLowerCase().includes('male'));
         }
     } else {
-        // 電腦網頁版：恢復 Google 的英文發音（例如 Google US English 或帶有 google 的英文語音）
         filtered = allVoices.filter(voice => {
             const name = voice.name.toLowerCase();
             const lang = voice.lang.toLowerCase();
@@ -472,7 +469,6 @@ function populateVoiceList() {
             return isEnglish && isGoogle && isNotMale;
         });
 
-        // 如果找不到 Google 語音，退回一般美式/英文語音
         if (filtered.length === 0) {
             filtered = allVoices.filter(voice => {
                 const name = voice.name.toLowerCase();
@@ -492,7 +488,6 @@ function populateVoiceList() {
         voiceSelect.appendChild(option);
     });
 
-    // 自動預設選中第一個符合條件的語音
     if (voiceSelect.options.length > 0) {
         voiceSelect.selectedIndex = 0;
     }
@@ -518,7 +513,6 @@ function speak(text) {
         utterance.voice = availableVoices[selectedIndex];
     }
 
-    // 語速已調慢（原為 0.85，現改為 0.7 讓發音更清晰）
     utterance.rate = 0.7;
     utterance.pitch = 1.0;
 
@@ -583,7 +577,6 @@ function updateFilteredData() {
         : wordDatabase.filter(item => item.group === selectedGroup);
 }
 
-// 學習翻頁
 function renderSingleCard() {
     const container = document.getElementById('singleCardContainer');
     const indicator = document.getElementById('pageIndicator');
@@ -638,7 +631,6 @@ function prevCard() {
     renderSingleCard();
 }
 
-// 選擇題
 function initQuiz() {
     document.getElementById('quizFeedback').textContent = '';
     const pool = filteredData.length > 0 ? filteredData : wordDatabase;
@@ -675,7 +667,6 @@ function initQuiz() {
     });
 }
 
-// 句型挖空選擇題
 function initSentenceQuiz() {
     document.getElementById('sentenceFeedback').textContent = '';
     const pool = filteredData.length > 0 ? filteredData : wordDatabase;
@@ -721,7 +712,6 @@ function initSentenceQuiz() {
     });
 }
 
-// 聽寫測驗
 function initDictation() {
     document.getElementById('dictationFeedback').textContent = '';
     document.getElementById('dictationInput').value = '';
@@ -754,7 +744,6 @@ function checkDictation() {
     }
 }
 
-// 拼字練習
 function initSpelling() {
     document.getElementById('spellingFeedback').textContent = '';
     document.getElementById('spellingInput').value = '';
