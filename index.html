@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌸 小學館全美語 ESL</title>
+    <title>🌸 KidsParadise 小學館全美語 ESL</title>
     <style>
         :root {
             --primary-color: #4a90e2;
@@ -224,7 +224,7 @@
 <body>
 
     <header>
-        <h1>🌸 小學館全美語 ESL</h1>
+        <h1>🌸 KidsParadise 小學館全美語 ESL</h1>
     </header>
 
     <div class="controls">
@@ -241,6 +241,7 @@
     <div class="nav-tabs">
         <button class="nav-btn active" onclick="switchTab('learn')">📖 學習</button>
         <button class="nav-btn" onclick="switchTab('quiz')">🧩 選擇題測驗</button>
+        <button class="nav-btn" onclick="switchTab('sentenceQuiz')">✏️ 句型挖空選擇</button>
         <button class="nav-btn" onclick="switchTab('dictation')">🎧 聽寫測驗</button>
         <button class="nav-btn" onclick="switchTab('spelling')">✍️ 拼字練習</button>
     </div>
@@ -262,6 +263,18 @@
             <div id="quizOptions" class="quiz-options"></div>
             <p id="quizFeedback" style="margin-top: 15px; font-weight: bold;"></p>
             <button onclick="initQuiz()" style="margin-top: 15px;">下一題</button>
+        </div>
+    </div>
+
+    <!-- 句型挖空選擇題分頁 -->
+    <div id="sentenceQuizTab" class="tab-content">
+        <div class="quiz-card">
+            <h3 style="color: #666; margin-bottom: 10px;">請根據例句選出正確填空：</h3>
+            <div id="sentenceQuestion" style="font-size: 20px; font-weight: bold; color: #2c3e50; margin: 20px 0; line-height: 1.5;">---</div>
+            <p id="sentenceChineseHint" style="color: #e67e22; font-size: 16px; font-style: italic;"></p>
+            <div id="sentenceOptions" class="quiz-options"></div>
+            <p id="sentenceFeedback" style="margin-top: 15px; font-weight: bold;"></p>
+            <button onclick="initSentenceQuiz()" style="margin-top: 15px;">下一題</button>
         </div>
     </div>
 
@@ -396,7 +409,7 @@ const defaultData = [
   { "word": "therefore", "pos": "adv.", "group": "ESL 6A", "chinese": "因此 / 所以", "defEn": "for that reason; because of what was just said", "example": "The road was closed; therefore, we took another way." },
   { "word": "improve", "pos": "v.", "group": "ESL 6A", "chinese": "改善 / 進步", "defEn": "to make something better or become better", "example": "Reading English books can improve your vocabulary." },
   { "word": "professional", "pos": "adj.", "group": "ESL 6A", "chinese": "專業的", "defEn": "connected with a job that needs special training", "example": "The photos were taken by a professional photographer." },
-  { "word": "memory", "pos": "n.", "group": "ESL 6A", "chinese": "記憶 / 記憶體", "defEn": "the ability to remember or a place where info is kept", "example": "My phone does not have enough memory." },
+  { "word": "memory", "pos": "n.", "group": "ESL 6A", "chinese": "記憶 / 記憶體", "defEn": "the ability or the place where info is kept", "example": "My phone does not have enough memory." },
   { "word": "include", "pos": "v.", "group": "ESL 6A", "chinese": "包括", "defEn": "to have someone or something as part of a group", "example": "The price includes lunch and a bus ticket." },
   { "word": "promote", "pos": "v.", "group": "ESL 6A", "chinese": "推廣 / 升遷", "defEn": "to advertise something or give someone a better job", "example": "The company uses social media to promote products." },
   { "word": "brain", "pos": "n.", "group": "ESL 6A", "chinese": "腦袋 / 腦部", "defEn": "the part inside your head that helps you think and learn", "example": "The doctor checked if her brain was injured." },
@@ -418,6 +431,8 @@ let wordDatabase = [];
 let filteredData = [];
 let currentIndex = 0;
 let currentQuizAnswer = '';
+let currentSentenceItem = null;
+let currentSentenceAnswer = '';
 let currentDictationItem = null;
 let currentSpellingItem = null;
 let availableVoices = [];
@@ -428,7 +443,6 @@ function populateVoiceList() {
     const allVoices = synth.getVoices();
     const voiceSelect = document.getElementById('voiceSelect');
     
-    // 嚴格篩選：只保留 Google 英文女生語音，對應 US 與 EN (UK/EN)
     availableVoices = allVoices.filter(voice => {
         const name = voice.name.toLowerCase();
         const lang = voice.lang.toLowerCase();
@@ -438,7 +452,6 @@ function populateVoiceList() {
         return isEnglish && isGoogle && isUsOrEn;
     });
 
-    // 若系統抓不到特定 Google 語音，退回到備用選項
     if (availableVoices.length === 0) {
         availableVoices = allVoices.filter(voice => voice.lang.toLowerCase().includes('en'));
     }
@@ -475,7 +488,6 @@ function speak(text) {
         utterance.voice = availableVoices[selectedIndex];
     }
 
-    // 語速再調慢一點點 (rate 設為 0.85)
     utterance.rate = 0.85;
     utterance.pitch = 1.0;
 
@@ -498,12 +510,16 @@ function switchTab(tabName) {
         document.querySelectorAll('.nav-btn')[1].classList.add('active');
         document.getElementById('quizTab').classList.add('active');
         initQuiz();
-    } else if (tabName === 'dictation') {
+    } else if (tabName === 'sentenceQuiz') {
         document.querySelectorAll('.nav-btn')[2].classList.add('active');
+        document.getElementById('sentenceQuizTab').classList.add('active');
+        initSentenceQuiz();
+    } else if (tabName === 'dictation') {
+        document.querySelectorAll('.nav-btn')[3].classList.add('active');
         document.getElementById('dictationTab').classList.add('active');
         initDictation();
     } else if (tabName === 'spelling') {
-        document.querySelectorAll('.nav-btn')[3].classList.add('active');
+        document.querySelectorAll('.nav-btn')[4].classList.add('active');
         document.getElementById('spellingTab').classList.add('active');
         initSpelling();
     }
@@ -619,6 +635,55 @@ function initQuiz() {
                 feedback.style.color = 'var(--success-color)';
             } else {
                 feedback.textContent = `❌ 答錯囉！正確答案是：${currentQuizAnswer}`;
+                feedback.style.color = 'var(--danger-color)';
+            }
+        };
+        optionsContainer.appendChild(btn);
+    });
+}
+
+// 句型挖空選擇題
+function initSentenceQuiz() {
+    document.getElementById('sentenceFeedback').textContent = '';
+    const pool = filteredData.length > 0 ? filteredData : wordDatabase;
+    // 過濾出有例句的項目
+    const validPool = pool.filter(item => item.example && item.example.includes(item.word));
+    const finalPool = validPool.length > 0 ? validPool : pool;
+    if (finalPool.length === 0) return;
+
+    currentSentenceItem = finalPool[Math.floor(Math.random() * finalPool.length)];
+    currentSentenceAnswer = currentSentenceItem.word;
+
+    // 將例句中的單字替換成底線挖空
+    let maskedExample = currentSentenceItem.example;
+    // 使用正則忽略大小寫替換
+    const regex = new RegExp(currentSentenceItem.word, 'gi');
+    maskedExample = maskedExample.replace(regex, '______');
+
+    document.getElementById('sentenceQuestion').innerHTML = maskedExample;
+    document.getElementById('sentenceChineseHint').textContent = `💡 中文提示：${currentSentenceItem.chinese}`;
+
+    let options = [currentSentenceItem.word];
+    while (options.length < 4 && options.length < wordDatabase.length) {
+        const randomItem = wordDatabase[Math.floor(Math.random() * wordDatabase.length)];
+        if (!options.includes(randomItem.word)) options.push(randomItem.word);
+    }
+    options.sort(() => Math.random() - 0.5);
+
+    const optionsContainer = document.getElementById('sentenceOptions');
+    optionsContainer.innerHTML = '';
+    options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'quiz-opt-btn';
+        btn.textContent = opt;
+        btn.onclick = () => {
+            const feedback = document.getElementById('sentenceFeedback');
+            if (opt.toLowerCase() === currentSentenceAnswer.toLowerCase()) {
+                feedback.textContent = '🎉 答對了！填空正確！';
+                feedback.style.color = 'var(--success-color)';
+                speak(currentSentenceItem.example);
+            } else {
+                feedback.textContent = `❌ 答錯囉！正確答案是：${currentSentenceAnswer}`;
                 feedback.style.color = 'var(--danger-color)';
             }
         };
