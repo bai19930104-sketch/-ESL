@@ -208,16 +208,79 @@
             background-color: #e2e6ea;
         }
 
-        .input-group {
+        /* 挖空與自定義鍵盤樣式 */
+        .blank-word-container {
             display: flex;
-            gap: 10px;
             justify-content: center;
-            margin-top: 20px;
+            gap: 8px;
+            margin: 25px 0;
+            flex-wrap: wrap;
         }
 
-        .input-group input {
-            flex: 1;
-            max-width: 300px;
+        .letter-box {
+            width: 40px;
+            height: 48px;
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 48px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            background-color: #f8fafc;
+            color: #1e293b;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .letter-box.revealed {
+            background-color: #e2e8f0;
+            color: #64748b;
+            cursor: default;
+        }
+
+        .letter-box.active-blank {
+            border-color: var(--primary-color);
+            background-color: #eff6ff;
+            box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.2);
+        }
+
+        .virtual-keyboard {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 20px;
+            background: #f1f5f9;
+            padding: 12px;
+            border-radius: 8px;
+        }
+
+        .keyboard-row {
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .key-btn {
+            background-color: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            padding: 10px 14px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+            min-width: 36px;
+        }
+
+        .key-btn:active {
+            background-color: #cbd5e1;
+        }
+
+        .key-btn.action-key {
+            background-color: #e2e8f0;
+            color: #0f172a;
         }
     </style>
 </head>
@@ -283,12 +346,14 @@
         <div class="quiz-card">
             <h2>聽發音填寫單字挖空</h2>
             <button onclick="playDictationAudio()" style="font-size: 24px; padding: 15px 25px; margin: 15px 0;">🔊 點擊播放發音</button>
-            <div id="dictationMaskedWord" style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #2c3e50; margin: 15px 0;">---</div>
             <p id="dictationHint" style="color: #666; font-style: italic;"></p>
-            <div class="input-group">
-                <input type="text" id="dictationInput" placeholder="請輸入完整英文單字..." onkeydown="if(event.key==='Enter') checkDictation()">
-                <button onclick="checkDictation()">提交答案</button>
-            </div>
+            
+            <!-- 挖空格子容器 -->
+            <div id="dictationWordContainer" class="blank-word-container"></div>
+            
+            <!-- 自定義英文鍵盤 -->
+            <div class="virtual-keyboard" id="dictationKeyboard"></div>
+
             <p id="dictationFeedback" style="margin-top: 15px; font-weight: bold;"></p>
             <button onclick="initDictation()" style="margin-top: 15px; background-color: #7f8c8d;">下一題</button>
         </div>
@@ -299,12 +364,14 @@
         <div class="quiz-card">
             <h2>看中文提示拼出挖空單字</h2>
             <div id="spellingChinese" style="font-size: 26px; color: #e67e22; font-weight: bold; margin: 15px 0;">---</div>
-            <div id="spellingMaskedWord" style="font-size: 28px; font-weight: bold; letter-spacing: 4px; color: #2c3e50; margin: 15px 0;">---</div>
-            <p id="spellingPos" style="color: #7f8c8d; font-style: italic;"></p>
-            <div class="input-group">
-                <input type="text" id="spellingInput" placeholder="請輸入完整英文單字..." onkeydown="if(event.key==='Enter') checkSpelling()">
-                <button onclick="checkSpelling()">提交拼字</button>
-            </div>
+            <p id="spellingPos" style="color: #7f8c8d; font-style: italic; margin-bottom: 10px;"></p>
+            
+            <!-- 挖空格子容器 -->
+            <div id="spellingWordContainer" class="blank-word-container"></div>
+
+            <!-- 自定義英文鍵盤 -->
+            <div class="virtual-keyboard" id="spellingKeyboard"></div>
+
             <p id="spellingFeedback" style="margin-top: 15px; font-weight: bold;"></p>
             <button onclick="initSpelling()" style="margin-top: 15px; background-color: #7f8c8d;">下一題</button>
         </div>
@@ -435,9 +502,17 @@ let currentIndex = 0;
 let currentQuizAnswer = '';
 let currentSentenceItem = null;
 let currentSentenceAnswer = '';
-let currentDictationItem = null;
-let currentSpellingItem = null;
 let availableVoices = [];
+
+// 聽寫測驗狀態
+let dictationItem = null;
+let dictationState = []; // 紀錄每個字元狀態：{ char: 'a', isBlank: true, userVal: '' }
+let activeDictationIndex = 0;
+
+// 拼字練習狀態
+let spellingItem = null;
+let spellingState = [];
+let activeSpellingIndex = 0;
 
 function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
@@ -453,11 +528,7 @@ function populateVoiceList() {
     const mobile = isMobileDevice();
 
     if (mobile) {
-        filtered = allVoices.filter(voice => {
-            const name = voice.name.toLowerCase();
-            return name.includes('samantha');
-        });
-
+        filtered = allVoices.filter(voice => voice.name.toLowerCase().includes('samantha'));
         if (filtered.length === 0) {
             filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en') && !voice.name.toLowerCase().includes('male'));
         }
@@ -465,23 +536,14 @@ function populateVoiceList() {
         filtered = allVoices.filter(voice => {
             const name = voice.name.toLowerCase();
             const lang = voice.lang.toLowerCase();
-            const isEnglish = lang.includes('en');
-            const isGoogle = name.includes('google');
-            const isNotMale = !name.includes('male') && !name.includes('david') && !name.includes('mark');
-            return isEnglish && isGoogle && isNotMale;
+            return lang.includes('en') && name.includes('google') && !name.includes('male') && !name.includes('david');
         });
-
         if (filtered.length === 0) {
-            filtered = allVoices.filter(voice => {
-                const name = voice.name.toLowerCase();
-                const lang = voice.lang.toLowerCase();
-                return lang.includes('en') && !name.includes('male');
-            });
+            filtered = allVoices.filter(voice => voice.lang.toLowerCase().includes('en') && !voice.name.toLowerCase().includes('male'));
         }
     }
 
     availableVoices = filtered;
-
     voiceSelect.innerHTML = '';
     availableVoices.forEach((voice, index) => {
         const option = document.createElement('option');
@@ -496,16 +558,13 @@ function populateVoiceList() {
 }
 
 populateVoiceList();
-if (typeof speechSynthesis !== 'undefined') {
-    if (speechSynthesis.onvoiceschanged !== undefined) {
-        speechSynthesis.onvoiceschanged = populateVoiceList;
-    }
+if (typeof speechSynthesis !== 'undefined' && speechSynthesis.onvoiceschanged !== undefined) {
+    speechSynthesis.onvoiceschanged = populateVoiceList;
 }
 
 function speak(text) {
     if (typeof speechSynthesis === 'undefined') return;
     speechSynthesis.cancel();
-
     const utterance = new SpeechSynthesisUtterance(text);
     const voiceSelect = document.getElementById('voiceSelect');
     const selectedIndex = voiceSelect.value;
@@ -513,7 +572,6 @@ function speak(text) {
     if (availableVoices.length > 0 && availableVoices[selectedIndex]) {
         utterance.voice = availableVoices[selectedIndex];
     }
-
     utterance.rate = 0.7;
     utterance.pitch = 1.0;
 
@@ -713,75 +771,282 @@ function initSentenceQuiz() {
     });
 }
 
-// 產生挖空文字輔助函數 (隨機抽出一半左右的字母改為底線)
-function createMaskedWord(word) {
-    return word.split('').map(char => {
-        if (char === ' ') return ' &nbsp; ';
-        // 保留符號，英文字母隨機挖空約 50%
+/* ================= 挖空與自定義鍵盤核心邏輯 ================= */
+
+function setupLetterPuzzle(item, containerId, keyboardId, checkCallback) {
+    const word = item.word;
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+    
+    stateArray = [];
+    for (let i = 0; i < word.length; i++) {
+        const char = word[i];
+        let isBlank = false;
+        let userVal = char;
+        
         if (/[a-zA-Z]/.test(char)) {
-            return Math.random() < 0.5 ? '_' : char;
+            // 隨機抽出一半左右的字母作為挖空，若單字很短至少挖空 1 個
+            isBlank = Math.random() < 0.5;
+            if (isBlank) userVal = '';
         }
-        return char;
-    }).join(' ');
+        
+        stateArray.push({ char: char, isBlank: isBlank, userVal: userVal });
+    }
+
+    // 確保至少有一個被挖空
+    if (!stateArray.some(s => s.isBlank)) {
+        const validIndices = [];
+        stateArray.forEach((s, idx) => { if (/[a-zA-Z]/.test(s.char)) validIndices.push(idx); });
+        if (validIndices.length > 0) {
+            const randIdx = validIndices[Math.floor(Math.random() * validIndices.length)];
+            stateArray[randIdx].isBlank = true;
+            stateArray[randIdx].userVal = '';
+        }
+    }
+
+    // 尋找第一個挖空的索引作為預設焦點
+    let firstBlank = stateArray.findIndex(s => s.isBlank && s.userVal === '');
+    if (firstBlank === -1) firstBlank = 0;
+
+    return { state: stateArray, activeIndex: firstBlank };
 }
+
+function renderWordBoxes(state, activeIndex, containerId, clickCallback) {
+    const container = document.getElementById(containerId);
+    container.innerHTML = '';
+
+    state.forEach((item, idx) => {
+        const box = document.createElement('div');
+        box.className = 'letter-box';
+        
+        if (!item.isBlank) {
+            box.classList.add('revealed');
+            box.textContent = item.char;
+        } else {
+            box.textContent = item.userVal || '';
+            if (idx === activeIndex) {
+                box.classList.add('active-blank');
+            }
+            box.onclick = () => { clickCallback(idx); };
+        }
+        container.appendChild(box);
+    });
+}
+
+function renderVirtualKeyboard(keyboardId, onKeyPress, onDelete) {
+    const kb = document.getElementById(keyboardId);
+    kb.innerHTML = '';
+
+    const rows = [
+        ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
+        ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
+        ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '⌫', ' ␣ ']
+    ];
+
+    rows.forEach(rowKeys => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'keyboard-row';
+        rowKeys.forEach(key => {
+            const btn = document.createElement('button');
+            btn.className = 'key-btn';
+            btn.textContent = key;
+            if (key === '⌫' || key === ' ␣ ') {
+                btn.classList.add('action-key');
+            }
+            btn.onclick = () => {
+                if (key === '⌫') {
+                    onDelete();
+                } else if (key === ' ␣ ') {
+                    onKeyPress(' ');
+                } else {
+                    onKeyPress(key.toLowerCase());
+                }
+            };
+            rowDiv.appendChild(btn);
+        });
+        kb.appendChild(rowDiv);
+    });
+}
+
+/* ================= 聽寫測驗控制 ================= */
+let dictationPuzzle = null;
 
 function initDictation() {
     document.getElementById('dictationFeedback').textContent = '';
-    document.getElementById('dictationInput').value = '';
     const pool = filteredData.length > 0 ? filteredData : wordDatabase;
     if (pool.length === 0) return;
 
-    currentDictationItem = pool[Math.floor(Math.random() * pool.length)];
-    document.getElementById('dictationMaskedWord').innerHTML = createMaskedWord(currentDictationItem.word);
-    document.getElementById('dictationHint').textContent = `提示：中文意思是「${currentDictationItem.chinese}」(${currentDictationItem.pos || ''})`;
+    dictationItem = pool[Math.floor(Math.random() * pool.length)];
+    document.getElementById('dictationHint').textContent = `💡 中文提示：${dictationItem.chinese} (${dictationItem.pos || ''})`;
+    
+    dictationPuzzle = setupLetterPuzzle(dictationItem, 'dictationWordContainer', 'dictationKeyboard', (idx) => {
+        dictationPuzzle.activeIndex = idx;
+        updateDictationUI();
+    });
+
+    renderVirtualKeyboard('dictationKeyboard', handleDictationKeyPress, handleDictationDelete);
+    updateDictationUI();
     playDictationAudio();
 }
 
-function playDictationAudio() {
-    if (currentDictationItem) {
-        speak(currentDictationItem.word);
+function updateDictationUI() {
+    renderWordBoxes(dictationPuzzle.state, dictationPuzzle.activeIndex, 'dictationWordContainer', (idx) => {
+        dictationPuzzle.activeIndex = idx;
+        updateDictationUI();
+    });
+}
+
+function handleDictationKeyPress(letter) {
+    if (!dictationPuzzle) return;
+    const state = dictationPuzzle.state;
+    let idx = dictationPuzzle.activeIndex;
+
+    if (idx < state.length) {
+        state[idx].userVal = letter;
+        // 自動跳到下一個挖空格子
+        let nextIdx = idx + 1;
+        while (nextIdx < state.length && (!state[nextIdx].isBlank || state[nextIdx].userVal !== '')) {
+            nextIdx++;
+        }
+        if (nextIdx < state.length) {
+            dictationPuzzle.activeIndex = nextIdx;
+        }
+        updateDictationUI();
+        checkDictationAuto();
     }
 }
 
-function checkDictation() {
-    if (!currentDictationItem) return;
-    const userVal = document.getElementById('dictationInput').value.trim().toLowerCase();
-    const correctVal = currentDictationItem.word.toLowerCase();
+function handleDictationDelete() {
+    if (!dictationPuzzle) return;
+    const state = dictationPuzzle.state;
+    let idx = dictationPuzzle.activeIndex;
+
+    if (state[idx].isBlank && state[idx].userVal !== '') {
+        state[idx].userVal = '';
+    } else {
+        // 往回找一個挖空格子清除
+        let prevIdx = idx - 1;
+        while (prevIdx >= 0 && !state[prevIdx].isBlank) {
+            prevIdx--;
+        }
+        if (prevIdx >= 0) {
+            dictationPuzzle.activeIndex = prevIdx;
+            state[prevIdx].userVal = '';
+        }
+    }
+    updateDictationUI();
+}
+
+function playDictationAudio() {
+    if (dictationItem) {
+        speak(dictationItem.word);
+    }
+}
+
+function checkDictationAuto() {
+    if (!dictationPuzzle) return;
+    const state = dictationPuzzle.state;
+    // 檢查是否所有挖空都填滿了
+    const allFilled = state.every(s => !s.isBlank || s.userVal !== '');
+    if (!allFilled) return;
+
+    const userWord = state.map(s => s.userVal).join('');
+    const correctWord = dictationItem.word.toLowerCase();
     const feedback = document.getElementById('dictationFeedback');
 
-    if (userVal === correctVal) {
+    if (userWord === correctWord) {
         feedback.textContent = '🎉 拼寫正確！太棒了！';
         feedback.style.color = 'var(--success-color)';
     } else {
-        feedback.textContent = `❌ 拼寫錯誤！正確單字是：${currentDictationItem.word}`;
+        feedback.textContent = `❌ 拼寫錯誤！正確單字是：${dictationItem.word}`;
         feedback.style.color = 'var(--danger-color)';
     }
 }
 
+
+/* ================= 拼字練習控制 ================= */
+let spellingPuzzle = null;
+
 function initSpelling() {
     document.getElementById('spellingFeedback').textContent = '';
-    document.getElementById('spellingInput').value = '';
     const pool = filteredData.length > 0 ? filteredData : wordDatabase;
     if (pool.length === 0) return;
 
-    currentSpellingItem = pool[Math.floor(Math.random() * pool.length)];
-    document.getElementById('spellingChinese').textContent = currentSpellingItem.chinese;
-    document.getElementById('spellingMaskedWord').innerHTML = createMaskedWord(currentSpellingItem.word);
-    document.getElementById('spellingPos').textContent = `詞性：${currentSpellingItem.pos || '未分類'} | 英文解釋：${currentSpellingItem.defEn || ''}`;
+    spellingItem = pool[Math.floor(Math.random() * pool.length)];
+    document.getElementById('spellingChinese').textContent = spellingItem.chinese;
+    document.getElementById('spellingPos').textContent = `詞性：${spellingItem.pos || '未分類'} | 英文解釋：${spellingItem.defEn || ''}`;
+
+    spellingPuzzle = setupLetterPuzzle(spellingItem, 'spellingWordContainer', 'spellingKeyboard', (idx) => {
+        spellingPuzzle.activeIndex = idx;
+        updateSpellingUI();
+    });
+
+    renderVirtualKeyboard('spellingKeyboard', handleSpellingKeyPress, handleSpellingDelete);
+    updateSpellingUI();
 }
 
-function checkSpelling() {
-    if (!currentSpellingItem) return;
-    const userVal = document.getElementById('spellingInput').value.trim().toLowerCase();
-    const correctVal = currentSpellingItem.word.toLowerCase();
+function updateSpellingUI() {
+    renderWordBoxes(spellingPuzzle.state, spellingPuzzle.activeIndex, 'spellingWordContainer', (idx) => {
+        spellingPuzzle.activeIndex = idx;
+        updateSpellingUI();
+    });
+}
+
+function handleSpellingKeyPress(letter) {
+    if (!spellingPuzzle) return;
+    const state = spellingPuzzle.state;
+    let idx = spellingPuzzle.activeIndex;
+
+    if (idx < state.length) {
+        state[idx].userVal = letter;
+        let nextIdx = idx + 1;
+        while (nextIdx < state.length && (!state[nextIdx].isBlank || state[nextIdx].userVal !== '')) {
+            nextIdx++;
+        }
+        if (nextIdx < state.length) {
+            spellingPuzzle.activeIndex = nextIdx;
+        }
+        updateSpellingUI();
+        checkSpellingAuto();
+    }
+}
+
+function handleSpellingDelete() {
+    if (!spellingPuzzle) return;
+    const state = spellingPuzzle.state;
+    let idx = spellingPuzzle.activeIndex;
+
+    if (state[idx].isBlank && state[idx].userVal !== '') {
+        state[idx].userVal = '';
+    } else {
+        let prevIdx = idx - 1;
+        while (prevIdx >= 0 && !state[prevIdx].isBlank) {
+            prevIdx--;
+        }
+        if (prevIdx >= 0) {
+            spellingPuzzle.activeIndex = prevIdx;
+            state[prevIdx].userVal = '';
+        }
+    }
+    updateSpellingUI();
+}
+
+function checkSpellingAuto() {
+    if (!spellingPuzzle) return;
+    const state = spellingPuzzle.state;
+    const allFilled = state.every(s => !s.isBlank || s.userVal !== '');
+    if (!allFilled) return;
+
+    const userWord = state.map(s => s.userVal).join('');
+    const correctWord = spellingItem.word.toLowerCase();
     const feedback = document.getElementById('spellingFeedback');
 
-    if (userVal === correctVal) {
+    if (userWord === correctWord) {
         feedback.textContent = '🎉 拼字完全正確！';
         feedback.style.color = 'var(--success-color)';
-        speak(currentSpellingItem.word);
+        speak(spellingItem.word);
     } else {
-        feedback.textContent = `❌ 答錯囉！正確拼字是：${currentSpellingItem.word}`;
+        feedback.textContent = `❌ 答錯囉！正確拼字是：${spellingItem.word}`;
         feedback.style.color = 'var(--danger-color)';
     }
 }
